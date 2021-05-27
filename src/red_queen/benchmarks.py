@@ -9,6 +9,8 @@ _base_path = Path(__file__).parent / "../../benchmarks"
 _base_path = _base_path.resolve()
 _base_path = _base_path.relative_to(os.getcwd())
 
+misc_qasm = sorted(_base_path.glob("misc/*.qasm"))
+
 queko_bigd_qasm = sorted(_base_path.glob("queko/BIGD/*.qasm"))
 queko_bntf_qasm = sorted(_base_path.glob("queko/BNTF/*.qasm"))
 queko_bss_qasm = sorted(_base_path.glob("queko/BSS/*.qasm"))
