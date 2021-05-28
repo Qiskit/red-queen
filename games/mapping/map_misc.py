@@ -32,7 +32,7 @@ def test_qiskit(benchmark, layout_method, routing_method, backend, qasm):
 @pytest.mark.tket
 @pytest.mark.parametrize("backend", backends)
 @pytest.mark.parametrize("qasm", misc_qasm)
-def test_tket(pawn, benchmark, backend, qasm):
+def test_tket(benchmark, backend, qasm):
     benchmark.name = qasm.name
     run_tket(benchmark, backend.configuration().coupling_map, qasm)
 
