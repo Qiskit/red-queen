@@ -27,7 +27,7 @@ class NameFormarter:
         elif self.group_by == ["name", "tool"]:
             name = f"({benchmark['algorithm']})"
         if benchmark["storage"]:
-            name = "{} ({:.4s})".format(name, benchmark["source"])
+            name = "{} ({:.4s})".format(name, benchmark["storage"])
         return name
 
 
