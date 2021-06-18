@@ -127,7 +127,7 @@ class BenchmarkFixture(object):
             duration, _ = runner(num_runs)
             if duration >= self._min_time:
                 break
-            elif duration >= (self._min_time / 2):
+            if duration >= (self._min_time / 2):
                 num_runs = int(ceil(self._min_time * num_runs / duration))
                 if num_runs == 1:
                     break
@@ -139,16 +139,21 @@ class BenchmarkFixture(object):
         runner = self._make_runner(function_to_benchmark, args, kwargs)
         duration, result = runner(None)
 
-        self.info.update(duration)
         if duration >= self._max_time:
+            if duration < 300:
+                for _ in range(5):
+                    round_duration, _ = runner(None)
+                    self.info.update(round_duration)
+            else:
+                self.info.update(duration)
             return self.info, result
 
         duration, num_runs = self._adjust_num_runs(runner)
         rounds = int(ceil(self._max_time / duration))
         rounds = min(rounds, sys.maxsize)
         for _ in range(rounds):
-            duration, _ = runner(num_runs)
-            self.info.update(duration)
+            round_duration, _ = runner(num_runs)
+            self.info.update(round_duration / num_runs)
 
         return self.info, result
 
