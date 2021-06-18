@@ -30,11 +30,17 @@ def _qiskit_pass_manager(
     coupling_map = CouplingMap(coupling_map)
     pm = PassManager()
 
-    # 1. Choose an initial layout
+    _swap = list()
+    if routing_method == "sabre":
+        _swap = [SabreSwap(coupling_map, heuristic="decay", seed=seed_transpiler)]
+    elif routing_method == "stochastic":
+        _swap = [StochasticSwap(coupling_map, trials=200, seed=seed_transpiler)]
+
+    # Choose an initial layout
     _choose_layout_0 = CSPLayout(coupling_map, call_limit=10000, seed=seed_transpiler)
     if layout_method == "sabre":
         _choose_layout_1 = SabreLayout(
-            coupling_map, max_iterations=2, seed=seed_transpiler
+            coupling_map, routing_pass=_swap[0], max_iterations=5, seed=seed_transpiler
         )
     elif layout_method == "dense":
         _choose_layout_1 = DenseLayout(coupling_map)
@@ -42,20 +48,13 @@ def _qiskit_pass_manager(
     def _choose_layout_condition(property_set):
         return not property_set["layout"]
 
-    # 2. Extend dag/layout with ancillae using the full coupling map
+    # Extend dag/layout with ancillae using the full coupling map
     _embed = [FullAncillaAllocation(coupling_map), EnlargeWithAncilla(), ApplyLayout()]
 
-    # 3. Swap to fit the coupling map
     _swap_check = CheckMap(coupling_map)
 
     def _swap_condition(property_set):
         return not property_set["is_swap_mapped"]
-
-    _swap = list()
-    if routing_method == "sabre":
-        _swap = [SabreSwap(coupling_map, heuristic="decay", seed=seed_transpiler)]
-    elif routing_method == "stochastic":
-        _swap = [StochasticSwap(coupling_map, trials=200, seed=seed_transpiler)]
 
     # Build pass manager
     pm.append(_choose_layout_0, condition=_choose_layout_condition)
