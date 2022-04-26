@@ -3,11 +3,11 @@
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
 import pytest
-from .bishop import Bishop
-from .rook import Rook
+from red_queen.bishop import Bishop
+from red_queen.rook import Rook
 
 
-class RedQueen(object):
+class RedQueen:
     """A pytest plugin that runs a multiprocessed test session.
 
     At the beginning of the test session, the RedQueen creates instances of a

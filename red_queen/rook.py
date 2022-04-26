@@ -2,14 +2,15 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-import psutil
 import random
 from itertools import cycle
 from multiprocessing.connection import wait
+
+import psutil
 from red_queen import Knight
 
 
-class Rook(object):
+class Rook:
     """The Rook is responsible for managing the test session.
 
     At the beginning of the test session, the RedQueen tells the Rook how many
@@ -45,8 +46,8 @@ class Rook(object):
         self.num_jobs = None
 
         self.pending = None
-        self.killed = list()
-        self.queue = list()
+        self.killed = []
+        self.queue = []
 
     def start_session(self, session, num_pawns: int) -> None:
         self.session = session

@@ -2,15 +2,15 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-import os
-import pytest
 import time
-from _pytest.config import Config, _prepareconfig
 from multiprocessing import get_context
+
+import pytest
+from _pytest.config import Config, _prepareconfig
 from setproctitle import setproctitle
 
 
-class Pawn(object):
+class Pawn:
     """The Pawn is responsible for actually running the tests.
 
     Its execution happens in a remote subprocesses. He relay all information

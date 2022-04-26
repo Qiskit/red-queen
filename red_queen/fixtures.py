@@ -2,7 +2,6 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-import pytest
 import sys
 import gc
 import statistics
@@ -12,7 +11,7 @@ from math import ceil
 from timeit import default_timer
 
 
-class BenchmarkInfo(object):
+class BenchmarkInfo:
     def _tool_name(self, fullname):
         index = fullname.find("[")
         name = fullname[:index]
@@ -24,8 +23,8 @@ class BenchmarkInfo(object):
         self.name = None
         self.tool = self._tool_name(node.name)
         self.algorithm = "default"
-        self._time_data = list()
-        self.quality_stats = dict()
+        self._time_data = []
+        self.quality_stats = {}
 
     def update(self, duration):
         self._time_data.append(duration)
@@ -66,11 +65,11 @@ class BenchmarkInfo(object):
         return len(self._time_data)
 
 
-class BenchmarkFixture(object):
+class BenchmarkFixture:
     def __init__(self, node):
         self.info = BenchmarkInfo(node)
-        # Config
-        self._disable_gc = False
+        # TODO: make configurable
+        self._disable_gc = True
         self._min_time = 5e-06
         self._max_time = 1.0
 
@@ -156,6 +155,3 @@ class BenchmarkFixture(object):
             self.info.update(round_duration / num_runs)
 
         return self.info, result
-
-
-

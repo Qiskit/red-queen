@@ -2,25 +2,27 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-import psutil
-from red_queen.pawn import create_pawn
 from multiprocessing import Pipe
 from multiprocessing.connection import Connection
 
+import psutil
+from red_queen.pawn import create_pawn
 
-class Knight(object):
+
+class Knight:
     """The Knight is responsible for enlisting and managing the Pawn.
 
     He keeps track of which jobs the Pawn is assigned and send commands.
     """
+
     def __init__(self, uid, config):
         self.uid = uid
         self.config = config
         self.shutdown_sent = False
-        self.current_jobs = list()
+        self.current_jobs = []
         if hasattr(self.config, "invocation_params"):
             self.args = [str(x) for x in self.config.invocation_params.args or ()]
-            self.option_dict = dict()
+            self.option_dict = {}
         else:
             self.args = self.config.args
             self.option_dict = vars(self.config.option)

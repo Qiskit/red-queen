@@ -1,8 +1,6 @@
 matplotlib
 py-cpuinfo
-pytket>=0.11.0
 pytest
 qiskit-terra
 setproctitle
 rich
-tweedledum-dev

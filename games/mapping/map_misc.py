@@ -4,10 +4,10 @@
 # ------------------------------------------------------------------------------
 import pytest
 
-from .mappers import run_qiskit, run_tket, run_tweedledum
 from qiskit.test.mock import FakeMontreal
+from mapping import run_qiskit_mapper, run_tweedledum_mapper
 from red_queen.benchmarks import misc_qasm
-from red_queen.fixtures import benchmark
+
 
 backends = [FakeMontreal()]
 
@@ -17,10 +17,10 @@ backends = [FakeMontreal()]
 @pytest.mark.parametrize("routing_method", ["sabre", "stochastic"])
 @pytest.mark.parametrize("backend", backends)
 @pytest.mark.parametrize("qasm", misc_qasm)
-def test_qiskit(benchmark, layout_method, routing_method, backend, qasm):
+def bench_qiskit(benchmark, layout_method, routing_method, backend, qasm) -> None:
     benchmark.name = qasm.name
     benchmark.algorithm = f"{layout_method} + {routing_method}"
-    run_qiskit(
+    run_qiskit_mapper(
         benchmark,
         layout_method,
         routing_method,
@@ -29,21 +29,13 @@ def test_qiskit(benchmark, layout_method, routing_method, backend, qasm):
     )
 
 
-@pytest.mark.tket
-@pytest.mark.parametrize("backend", backends)
-@pytest.mark.parametrize("qasm", misc_qasm)
-def test_tket(benchmark, backend, qasm):
-    benchmark.name = qasm.name
-    run_tket(benchmark, backend.configuration().coupling_map, qasm)
-
-
 @pytest.mark.tweedledum
 @pytest.mark.parametrize("routing_method", ["jit", "sabre"])
 @pytest.mark.parametrize("backend", backends)
 @pytest.mark.parametrize("qasm", misc_qasm)
-def test_tweedledum(benchmark, routing_method, backend, qasm):
+def bench_tweedledum(benchmark, routing_method, backend, qasm) -> None:
     benchmark.name = qasm.name
     benchmark.algorithm = routing_method
-    run_tweedledum(
+    run_tweedledum_mapper(
         benchmark, routing_method, backend.configuration().coupling_map, qasm
     )

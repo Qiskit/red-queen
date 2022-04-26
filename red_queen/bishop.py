@@ -2,15 +2,16 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-import cpuinfo
 import json
 import platform
 import os
 import tempfile
 from pathlib import Path
 
+import cpuinfo
 
-class Bishop(object):
+
+class Bishop:
     """The Bishop is responsible for storing the results on a file."""
 
     @staticmethod
@@ -46,14 +47,17 @@ class Bishop(object):
     def __init__(self, config):
         self.store_data = config.option.store_data
         self.storage_dir = config.option.storage_dir
-        self.report = dict()
+        self.report = {}
         self.report["machine_info"] = self._get_machine_info()
-        self.report["benchmarks"] = list()
+        self.report["benchmarks"] = []
 
     def add_benchmark_info(self, benchmark_info):
         self.report["benchmarks"].append(benchmark_info)
 
     def store(self):
+        if self.report['benchmarks'].empty():
+            return
+
         tmpfd, tmppath = tempfile.mkstemp(prefix="RedQueen_", text=True)
         with open(tmpfd, "w", encoding="utf-8") as outfile:
             outfile.write(json.dumps(self.report, indent=4))

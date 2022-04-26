@@ -3,12 +3,10 @@
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
 import os
-import pytest
-import sys
 import pathlib
 
-_base_path = pathlib.Path(__file__).parent.resolve() / "src"
-sys.path.insert(0, str(_base_path))
+import pytest
+from red_queen.fixtures import BenchmarkFixture
 
 
 def parse_num_pawns(string):
@@ -53,6 +51,16 @@ def pytest_addoption(parser):
 
 @pytest.mark.trylast
 def pytest_configure(config):
+    print(config.option)
     if not hasattr(config.option, "is_pawn") and not config.getvalue("collectonly"):
         from red_queen.queen import RedQueen
+
         config.pluginmanager.register(RedQueen(config), "red_queen")
+
+
+@pytest.fixture(scope="function")
+def benchmark(request):
+    fixture = BenchmarkFixture(request.node)
+    yield fixture
+    pawn = request.config.pluginmanager.getplugin("pawn")
+    pawn.send_report("benchmark_info", info=fixture.info.as_dict())
