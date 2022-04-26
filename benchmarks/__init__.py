@@ -5,7 +5,7 @@
 import os
 from pathlib import Path
 
-_base_path = Path(__file__).parent / "../../benchmarks"
+_base_path = Path(__file__).parent
 _base_path = _base_path.resolve()
 _base_path = _base_path.relative_to(os.getcwd())
 

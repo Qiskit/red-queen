@@ -4,8 +4,9 @@
 # ------------------------------------------------------------------------------
 import pytest
 
+from benchmarks import queko_qasm, queko_coupling
 from mapping import run_qiskit_mapper, run_tweedledum_mapper
-from red_queen.benchmarks import queko_qasm, queko_coupling
+
 
 @pytest.mark.qiskit
 @pytest.mark.parametrize("layout_method", ["dense", "sabre"])
