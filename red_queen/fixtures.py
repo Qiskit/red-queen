@@ -158,9 +158,4 @@ class BenchmarkFixture(object):
         return self.info, result
 
 
-@pytest.fixture(scope="function")
-def benchmark(request):
-    fixture = BenchmarkFixture(request.node)
-    yield fixture
-    pawn = request.config.pluginmanager.getplugin("pawn")
-    pawn.send_report("benchmark_info", info=fixture.info.as_dict())
+
