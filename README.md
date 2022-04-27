@@ -18,56 +18,42 @@ effectively, you should know the basics of `pytest` first. Take a look at the
 [introductory material](https://docs.pytest.org/en/latest/getting-started.html).
 
 ## Usage
-TODO
+Red Queen is a framework for benchmarking quantum compilation algorithms. Since
+it was not designed as a package, there is no notion of installation. Hence, you
+must clone this repository to use it:
+```bash
+git clone git@github.com:Qiskit/red-queen.git
+```
 
-## The games
-TODO
+To run benchmarks, you must first go to the `red-queen` directory and install 
+the required packages:
+```bash
+cd red-queen
+pip install -r requirements.txt
+```
 
-## How execution works
-The inner workings of this framework is quite similar
-to that of [pytest-xdist](https://github.com/pytest-dev/pytest-xdist).
+Now, suppose you want to run the mapping benchmarks using only `tweedledum`.
+You must do it using `pytest`
+```bash
+pytest games/mapping/map_queko.py -m tweedledum --store
+```
+The benchmark suite will consider all functions named `bench_*` in 
+`games/mapping/map_queko.py`. Because we set the `-m` option, only the the ones
+marked with `tweedledum` will be run. (We could easy do the same for `qiskit`).
+If you don't define a `-m` option, all `bench_*` functions will be run.
 
-The RedQueen benchmark framework works by spawning one or more `Pawn`s, which 
-are controlled by a `Rook`. The communication between the `Rook` and the `Pawn`s
-is managed by `Knight`s. Furthermore, the `Rook` must report results back to the 
-`Queen` and the Bishop, which is responsible for storing those results.  Each 
-`Pawn` is responsible for collecting tests and running the tests assigned to it
-by the `Rook`.
+The `--store` option tells the framework to store the results in json file in
+the `results` directory. To see the results as a table, you can use the you can
+use:
+```bash
+python -m report.console_tables --storage results/0001_bench.json
+```
 
-A slightly more details of the working flow is as follows:
+## Warning
+This code is still under development. There are many razer sharp edges.
 
-1. The `Queen` initializes instances of a `Rook` and a `Bishop`.
-2. At the beginning of the test session, the `Queen` tells the `Rook` how many 
-pawns it should employ to run all tests. In turn, the `Rook` spawns the pawns as
-subprocesses.  The communication between the `Rook` and the `Pawn`s is managed 
-by `Knight` objects and makes use of `Pipe`s.
-3. For technical reasons [1], each `Pawn` itself is a mini `pytest` runner.
-Whenever a `Pawn` is initialized, it performs an entire test collection and
-reports the number of collected tests back to the `Rook`.  After that, a pawn 
-must sit idle, waiting for commands.  
-
-(Note that the `Rook` does not perform any collection itself.)
-
-4. After spawning all `Pawns`, it waits for all of them to report back with the
-total number of collected tests.
-5. If all is well, the `Rook` distributes tests among the pawns by sending them
-indexes of the test they should execute. (This works because all `Pawn`s have
-the same collected list of tests.)
-6. As the `Pawn`s start and complete tests, they report results back to the
-`Rook` through the `Knight`s. In turn, the `Rook` forwards the results to the
-`Bishop` and the appropriate `pytest` hooks (`pytest_runtest_logstart`,
-`pytest_runtest_logreport`, and `pytest_runtest_logfinish`).  The latter is
-essential to `pytest` be able to report progress.
-7. The `Rook` assigns new tests to `Pawn`s when a test completes.  When it runs
-out of tests to assign, it sends a `shutdown` signal.
-
-
-[1] If the collection of tests was performed by the `Rook`, the `Rook` would 
-have to serialize collected items to send them through the pipe, as `Pawn`s
-execute in other processes. However, those test items are not easy to serialize!
-Furthermore, I believe that even if I managed to serialize test items, the 
-solution would be complex and fragile, as any slight change in `pytest` might be
-enough to break things.
+For information of how execution works and other details about the framwork
+design, see the [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Acknowledgments
 
