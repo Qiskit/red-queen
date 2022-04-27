@@ -4,9 +4,9 @@
 # ------------------------------------------------------------------------------
 import json
 import platform
-import os
 import tempfile
 from pathlib import Path
+import shutil
 
 import cpuinfo
 
@@ -55,7 +55,7 @@ class Bishop:
         self.report["benchmarks"].append(benchmark_info)
 
     def store(self):
-        if self.report['benchmarks'].empty():
+        if not self.report['benchmarks']:
             return
 
         tmpfd, tmppath = tempfile.mkstemp(prefix="RedQueen_", text=True)
@@ -65,6 +65,6 @@ class Bishop:
             if not self.storage_dir.exists():
                 self.storage_dir.mkdir(parents=True, exist_ok=True)
             filepath = self.storage_dir / f"{self._next_id()}_bench.json"
-            os.rename(tmppath, filepath)
+            shutil.move(tmppath, filepath)
         else:
             print(f"Results temporarily store at: {tmppath}")
