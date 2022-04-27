@@ -11,7 +11,7 @@ from qiskit.transpiler import CouplingMap
 from qiskit.transpiler.passmanager import PassManager
 from qiskit.transpiler.passes import ApplyLayout
 from qiskit.transpiler.passes import CheckMap
-from qiskit.transpiler.passes import CSPLayout
+from qiskit.transpiler.passes import VF2Layout
 from qiskit.transpiler.passes import DenseLayout
 from qiskit.transpiler.passes import EnlargeWithAncilla
 from qiskit.transpiler.passes import FullAncillaAllocation
@@ -33,7 +33,14 @@ def _qiskit_pass_manager(
         _swap = [StochasticSwap(coupling_map, trials=200, seed=seed_transpiler)]
 
     # Choose an initial layout
-    _choose_layout_0 = CSPLayout(coupling_map, call_limit=10000, seed=seed_transpiler)
+    _choose_layout_0 = VF2Layout(
+        coupling_map,
+        seed=seed_transpiler,
+        call_limit=int(5e4),  # Set call limit to ~100ms with retworkx 0.10.2
+        time_limit=0.1,
+        properties=backend_properties,
+        target=target,
+    )
     if layout_method == "sabre":
         _choose_layout_1 = SabreLayout(
             coupling_map, routing_pass=_swap[0], max_iterations=5, seed=seed_transpiler
