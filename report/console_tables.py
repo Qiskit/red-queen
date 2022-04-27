@@ -4,13 +4,14 @@
 # ------------------------------------------------------------------------------
 import argparse
 import pathlib
-
 from collections import defaultdict
-from loader import group_benchmarks, load_benchmarks
 from math import isinf
+from statistics import geometric_mean
+
 from rich.console import Console
 from rich.table import Table
-from statistics import geometric_mean
+
+from .loader import group_benchmarks, load_benchmarks
 
 
 class NameFormarter:
@@ -147,7 +148,7 @@ if __name__ == "__main__":
     table = Table(title=f"TLDR")
     table.add_column("Name")
     table.add_column("Mean")
-    best = defaultdict(lambda:float('inf'))
+    best = defaultdict(lambda: float("inf"))
     worst = defaultdict(float)
     for name, data in aggregate.items():
         for stat, series in data.items():
