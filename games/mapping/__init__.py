@@ -38,8 +38,6 @@ def _qiskit_pass_manager(
         seed=seed_transpiler,
         call_limit=int(5e4),  # Set call limit to ~100ms with retworkx 0.10.2
         time_limit=0.1,
-        properties=backend_properties,
-        target=target,
     )
     if layout_method == "sabre":
         _choose_layout_1 = SabreLayout(
