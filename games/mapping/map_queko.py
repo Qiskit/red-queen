@@ -5,7 +5,7 @@
 import pytest
 
 from benchmarks import queko_qasm, queko_coupling
-from mapping import run_qiskit_mapper, run_tweedledum_mapper
+from mapping import run_qiskit_mapper, run_tweedledum_mapper, run_tket_mapper
 
 
 @pytest.mark.qiskit
@@ -30,3 +30,13 @@ def bench_tweedledum(benchmark, qasm) -> None:
     benchmark.algorithm = f"ApprxSatPlacer + LazyRouter"
     coupling_map = queko_coupling[benchmark.name[:5]]
     run_tweedledum_mapper(benchmark, "jit", coupling_map, qasm)
+
+
+@pytest.mark.tket
+@pytest.mark.parametrize("layout_method", ["graph", "line"])
+@pytest.mark.parametrize("qasm", queko_qasm)
+def bench_tket(benchmark, layout_method, qasm) -> None:
+    benchmark.name = qasm.name
+    benchmark.algorithm = "GraphPlacement + Routing"
+    coupling_map = queko_coupling[benchmark.name[:5]]
+    run_tket_mapper(benchmark, layout_method, coupling_map, qasm)

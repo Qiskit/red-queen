@@ -6,6 +6,12 @@ from tweedledum.ir import Circuit
 from tweedledum.target import Device
 from tweedledum.passes import bridge_decomp, bridge_map, jit_map, sabre_map
 
+from pytket.qasm import circuit_from_qasm
+from pytket.passes import PlacementPass, RoutingPass
+from pytket.placement import GraphPlacement, LinePlacement
+from pytket.architecture import Architecture
+from pytket.circuit import OpType
+
 from qiskit import QuantumCircuit
 from qiskit.transpiler import CouplingMap
 from qiskit.transpiler.passmanager import PassManager
@@ -89,3 +95,25 @@ def run_tweedledum_mapper(benchmark, routing_method, coupling_map, path):
         if instruction.kind() == "std.swap":
             swaps_cost += 2
     info.quality_stats["cx"] = swaps_cost + len(mapped_circuit) - len(circuit)
+
+
+def run_tket_mapper(benchmark, layout_method, coupling_map, path):
+    device = Architecture(coupling_map)
+    if layout_method == 'line':
+        placement = PlacementPass(LinePlacement(device))
+    elif layout_method == 'graph':
+        placement = PlacementPass(GraphPlacement(device))
+    mapping = RoutingPass(device)
+    info, mapped_circuit = benchmark(
+        _tket_map_and_route, circuit_from_qasm(path), placement, mapping
+    )
+    info.quality_stats["cx"] = 3 * len(mapped_circuit.ops_of_type(OpType.SWAP))
+
+
+def _tket_map_and_route(circuit, placement, mapping):
+    # Things fail because of shared inplace modification without a copy
+    # doing the copy outside the timed method causes failures
+    circ = circuit.copy()
+    placement.apply(circ)
+    mapping.apply(circ)
+    return circ
