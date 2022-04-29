@@ -37,6 +37,6 @@ def bench_tweedledum(benchmark, qasm) -> None:
 @pytest.mark.parametrize("qasm", queko_qasm)
 def bench_tket(benchmark, layout_method, qasm) -> None:
     benchmark.name = qasm.name
-    benchmark.algorithm = "GraphPlacement + Routing"
+    benchmark.algorithm = f"{layout_method} Placement + Routing"
     coupling_map = queko_coupling[benchmark.name[:5]]
     run_tket_mapper(benchmark, layout_method, coupling_map, qasm)
