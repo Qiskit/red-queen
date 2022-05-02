@@ -33,7 +33,7 @@ unsafe-load-any-extension=no
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code
-extension-pkg-allow-list=numpy, tweedledum, qiskit._accelerate
+extension-pkg-allow-list=numpy, tweedledum, qiskit._accelerate, pytket, setproctitle
 
 
 [MESSAGES CONTROL]
@@ -72,9 +72,8 @@ disable=spelling,       # way too noisy
     no-else-return,     # relax "elif" after a clause with a return
     docstring-first-line-empty, # relax docstring style
     import-outside-toplevel,
-    bad-continuation, bad-whitespace # differences of opinion with black
-
-
+    bad-continuation, bad-whitespace, # differences of opinion with black
+    missing-function-docstring
 
 
 [REPORTS]

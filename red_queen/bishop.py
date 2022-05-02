@@ -2,6 +2,9 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+"""Bishop for storing benchmark results."""
+
 import json
 import platform
 import tempfile
@@ -39,10 +42,7 @@ class Bishop:
         paths.sort(key=lambda path: (path.name), reverse=True)
         if not paths:
             return "0001"
-        try:
-            return "%04i" % (int(str(paths[0].name).split("_")[0]) + 1)
-        except ValueError:
-            raise
+        return format(int(str(paths[0].name).split("_", maxsplit=1)[0]) + 1, "04d")
 
     def __init__(self, config):
         self.store_data = config.option.store_data
@@ -55,7 +55,7 @@ class Bishop:
         self.report["benchmarks"].append(benchmark_info)
 
     def store(self):
-        if not self.report['benchmarks']:
+        if not self.report["benchmarks"]:
             return
 
         tmpfd, tmppath = tempfile.mkstemp(prefix="RedQueen_", text=True)

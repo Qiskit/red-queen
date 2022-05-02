@@ -2,6 +2,9 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+"""Load benchmark result functions."""
+
 import json
 from collections import defaultdict
 
@@ -18,11 +21,11 @@ def load_benchmarks(dir_or_file, filter_by=None):
         paths = list(dir_or_file.glob("**/*.json"))
         paths.sort(key=lambda path: (path.name, path.parent))
         for path in paths:
-            if path.is_file() == False:
+            if not path.is_file():
                 continue
             try:
                 data = json.loads(path.read_text(encoding="utf8"))
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 print(f"Failed to load JSON file: {path}")
                 continue
             for benchmark in data["benchmarks"]:

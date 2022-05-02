@@ -2,10 +2,13 @@
 # Part of Red Queen Project.  This file is distributed under the MIT License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+"""QUEKO mapping benchmarks."""
+
 import pytest
 
-from benchmarks import queko_qasm, queko_coupling
 from mapping import run_qiskit_mapper, run_tweedledum_mapper, run_tket_mapper
+from benchmarks import queko_qasm, queko_coupling
 
 
 @pytest.mark.qiskit
@@ -16,7 +19,7 @@ def bench_qiskit(benchmark, layout_method, routing_method, qasm) -> None:
     benchmark.name = qasm.name
     benchmark.algorithm = f"{layout_method} + {routing_method}"
     # This is really annoying:
-    coupling_map = list()
+    coupling_map = []
     for pair in queko_coupling[benchmark.name[:5]]:
         coupling_map.append(pair)
         coupling_map.append(pair[::-1])
@@ -27,7 +30,7 @@ def bench_qiskit(benchmark, layout_method, routing_method, qasm) -> None:
 @pytest.mark.parametrize("qasm", queko_qasm)
 def bench_tweedledum(benchmark, qasm) -> None:
     benchmark.name = qasm.name
-    benchmark.algorithm = f"ApprxSatPlacer + LazyRouter"
+    benchmark.algorithm = "ApprxSatPlacer + LazyRouter"
     coupling_map = queko_coupling[benchmark.name[:5]]
     run_tweedledum_mapper(benchmark, "jit", coupling_map, qasm)
 

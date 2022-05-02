@@ -2,6 +2,9 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+"""Pwan module for running benchmarks."""
+
 import time
 from multiprocessing import get_context
 
@@ -23,6 +26,7 @@ class Pawn:
         self.channel = channel
         self.processed_items = 0
         self.num_deselected = 0
+        self.session = None
 
     def send_report(self, name, **kwargs):
         self.channel.send((self.uid, name, kwargs))
@@ -31,7 +35,7 @@ class Pawn:
         self.session = session
         self.send_report("sessionstart")
 
-    def pytest_collection(self, session):
+    def pytest_collection(self, session):  # pylint: disable=unused-argument
         self.send_report("collection")
 
     def pytest_deselected(self, items) -> None:
@@ -45,7 +49,7 @@ class Pawn:
         )
 
     def pytest_runtestloop(self, session):
-        to_run = list()
+        to_run = []
         while 1:
             try:
                 name, kwargs = self.channel.recv()
@@ -75,9 +79,7 @@ class Pawn:
         start = time.time()
         self.config.hook.pytest_runtest_protocol(item=item, nextitem=next_item)
         duration = time.time() - start
-        self.send_report(
-            "runtest_protocol_complete", item_index=item_index, duration=duration
-        )
+        self.send_report("runtest_protocol_complete", item_index=item_index, duration=duration)
         setproctitle(f"pawn-{self.uid} | {self.processed_items} | waiting")
         self.processed_items += 1
 
@@ -91,7 +93,7 @@ class Pawn:
         self.send_report("logfinish", nodeid=nodeid, location=location)
 
     @pytest.hookimpl(hookwrapper=True)
-    def pytest_sessionfinish(self, exitstatus):
+    def pytest_sessionfinish(self, exitstatus):  # pylint: disable=unused-argument
         # self.config.workeroutput["exitstatus"] = int(exitstatus)
         yield
         self.send_report("sessionfinish")

@@ -2,6 +2,10 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+# pylint: disable=unused-argument
+
+"""Rook module for managing test session."""
+
 import random
 from itertools import cycle
 from multiprocessing.connection import wait
@@ -33,7 +37,7 @@ class Rook:
     def __init__(self, config, bishop):
         self.config = config
         self.bishop = bishop
-        self.tr = self.config.pluginmanager.getplugin("terminalreporter")
+        self.reporter = self.config.pluginmanager.getplugin("terminalreporter")
 
         # Knights information
         self.knights = None
@@ -92,12 +96,11 @@ class Rook:
             self.channels.append(knight.pawn_start())
 
     def _set_num_jobs(self, num_jobs: int) -> None:
-        if not self.num_jobs == None:
-            assert num_jobs == self.num_jobs
+        if self.num_jobs is not None and num_jobs == self.num_jobs:
             return
         self.num_jobs = num_jobs
         self.session.testscollected = num_jobs
-        self.pending = [i for i in range(num_jobs)]
+        self.pending = list(range(num_jobs))
 
     def _assign_job(self, knight) -> None:
         """Try to assign a new job.
@@ -137,9 +140,9 @@ class Rook:
     def _knight_collection(self, knight):
         self.collecting += 1
         if self.collecting == 1:
-            self.tr.write(f"Collecting...{self.collecting}", flush=True, bold=True)
+            self.reporter.write(f"Collecting...{self.collecting}", flush=True, bold=True)
         else:
-            self.tr.rewrite(
+            self.reporter.rewrite(
                 f"Collecting...{self.collecting}", flush=True, bold=True, erase=True
             )
 
@@ -156,7 +159,7 @@ class Rook:
             if num_collected > num_selected:
                 line += f" / {num_selected} selected"
             line += "\n"
-            self.tr.rewrite(line, bold=True, erase=True)
+            self.reporter.rewrite(line, bold=True, erase=True)
         elif self.done_collecting > len(self.knights):
             # This is a new pawn
             self._assign_job(knight)
