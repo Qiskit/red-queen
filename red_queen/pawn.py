@@ -3,7 +3,7 @@
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
 
-"""Pwan module for running benchmarks."""
+"""Pawn module for running benchmarks."""
 
 import time
 from multiprocessing import get_context
