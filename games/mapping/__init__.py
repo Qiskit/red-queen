@@ -2,6 +2,10 @@
 # Part of Red Queen Project.  This file is distributed under the MIT License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+"""Mapping benchmarks."""
+
+
 from tweedledum.ir import Circuit
 from tweedledum.target import Device
 from tweedledum.passes import bridge_decomp, bridge_map, jit_map, sabre_map
@@ -26,13 +30,11 @@ from qiskit.transpiler.passes import SabreSwap
 from qiskit.transpiler.passes import StochasticSwap
 
 
-def _qiskit_pass_manager(
-    layout_method, routing_method, coupling_map, seed_transpiler=1337
-):
+def _qiskit_pass_manager(layout_method, routing_method, coupling_map, seed_transpiler=1337):
     coupling_map = CouplingMap(coupling_map)
     pm = PassManager()
 
-    _swap = list()
+    _swap = []
     if routing_method == "sabre":
         _swap = [SabreSwap(coupling_map, heuristic="decay", seed=seed_transpiler)]
     elif routing_method == "stochastic":
@@ -99,9 +101,9 @@ def run_tweedledum_mapper(benchmark, routing_method, coupling_map, path):
 
 def run_tket_mapper(benchmark, layout_method, coupling_map, path):
     device = Architecture(coupling_map)
-    if layout_method == 'line':
+    if layout_method == "line":
         placement = PlacementPass(LinePlacement(device))
-    elif layout_method == 'graph':
+    elif layout_method == "graph":
         placement = PlacementPass(GraphPlacement(device))
     mapping = RoutingPass(device)
     info, mapped_circuit = benchmark(
