@@ -2,11 +2,14 @@
 # Part of Red Queen Project.  This file is distributed under the MIT License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-import pytest
 
+"""Misc mapping benchmarks."""
+
+import pytest
 from qiskit.test.mock import FakeMontreal
-from benchmarks import misc_qasm
+
 from mapping import run_qiskit_mapper, run_tweedledum_mapper
+from benchmarks import misc_qasm
 
 
 backends = [FakeMontreal()]
@@ -36,6 +39,4 @@ def bench_qiskit(benchmark, layout_method, routing_method, backend, qasm) -> Non
 def bench_tweedledum(benchmark, routing_method, backend, qasm) -> None:
     benchmark.name = qasm.name
     benchmark.algorithm = routing_method
-    run_tweedledum_mapper(
-        benchmark, routing_method, backend.configuration().coupling_map, qasm
-    )
+    run_tweedledum_mapper(benchmark, routing_method, backend.configuration().coupling_map, qasm)

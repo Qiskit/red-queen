@@ -2,6 +2,10 @@
 # Part of Qiskit.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+"""Benchmark fixtures."""
+
+
 import sys
 import gc
 import statistics
@@ -12,6 +16,8 @@ from timeit import default_timer
 
 
 class BenchmarkInfo:
+    """Benchmark information."""
+
     def _tool_name(self, fullname):
         index = fullname.find("[")
         name = fullname[:index]
@@ -36,9 +42,7 @@ class BenchmarkInfo:
             "tool": self.tool,
             "algorithm": self.algorithm,
             "stats": {
-                "timing": dict(
-                    (field, getattr(self, field)) for field in self._fields()
-                ),
+                "timing": dict((field, getattr(self, field)) for field in self._fields()),
                 "quality": self.quality_stats,
             },
         }
@@ -66,6 +70,8 @@ class BenchmarkInfo:
 
 
 class BenchmarkFixture:
+    """Benchmark fixture."""
+
     def __init__(self, node):
         self.info = BenchmarkInfo(node)
         # TODO: make configurable
