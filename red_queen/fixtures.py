@@ -117,10 +117,7 @@ class BenchmarkFixture:
                     result = function_to_benchmark(*args, **kwargs)
                     end = default_timer()
                     return end - start, result
-            except:
-                raise
             finally:
-                # if not __debug__:
                 sys.settrace(tracer)
                 if gc_enabled:
                     gc.enable()

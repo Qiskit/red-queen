@@ -21,7 +21,7 @@ from qiskit.circuit.library.standard_gates.equivalence_library import (
 )
 
 
-def _qiskit_pass_manager(basis_method, basis, seed_transpiler=1337):
+def _qiskit_pass_manager(basis_method, basis):
     pm = PassManager()
 
     if basis_method == "basis_translator":
@@ -43,5 +43,5 @@ def _qiskit_pass_manager(basis_method, basis, seed_transpiler=1337):
 def run_qiskit_basis(benchmark, basis_method, basis, path):
     circuit = QuantumCircuit.from_qasm_file(str(path))
     pm = _qiskit_pass_manager(basis_method, basis)
-    info, mapped_circuit = benchmark(pm.run, circuit)
+    info, _ = benchmark(pm.run, circuit)
     info.tool_version = qiskit.version.get_version_info()

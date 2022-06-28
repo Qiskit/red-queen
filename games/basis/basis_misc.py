@@ -6,7 +6,6 @@
 """Misc mapping benchmarks."""
 
 import pytest
-import scipy.stats
 from basis import run_qiskit_basis
 from benchmarks import misc_qasm
 
