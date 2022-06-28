@@ -101,7 +101,7 @@ class BenchmarkFixture:
             if self._disable_gc:
                 gc.disable()
             tracer = sys.gettrace()
-            #sys.settrace(None)
+            sys.settrace(None)
             try:
                 if num_runs:
                     r = range(num_runs)
@@ -115,8 +115,11 @@ class BenchmarkFixture:
                     result = function_to_benchmark(*args, **kwargs)
                     end = default_timer()
                     return end - start, result
+            except:
+                raise
             finally:
-                #sys.settrace(tracer)
+                #if not __debug__:
+                sys.settrace(tracer)
                 if gc_enabled:
                     gc.enable()
 
