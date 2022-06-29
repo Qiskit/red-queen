@@ -30,7 +30,7 @@ def main(path, framework="dtale"):
         result_data_list.append({"benchmarks": result_data["benchmarks"], "file": data_path})
     df = pd.json_normalize(result_data_list, record_path=["benchmarks"], meta=["file"])
 
-    session = eda.show(df)
+    session = eda.show(df, host="localhost", subprocess=False)
     session.open_browser()
 
 
