@@ -5,11 +5,17 @@
 
 """Benchmark Bernstein Vazirani circuits."""
 
+import os
+
 import pytest
 
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 from applications import backends, run_qiskit_circuit
+
+
+QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
+SECRET_STRING = "110011"
 
 
 def build_bv_circuit(secret_string, mid_circuit_measure=False):
@@ -52,14 +58,19 @@ def build_bv_circuit(secret_string, mid_circuit_measure=False):
 @pytest.mark.parametrize("backend", backends)
 @pytest.mark.parametrize("method", ["normal", "mid-circuit measurement"])
 def bench_qiskit_bv(benchmark, optimization_level, backend, method):
-    secret_string = "110011"
     shots = 65536
-    expected_counts = {secret_string: shots}
+    expected_counts = {SECRET_STRING: shots}
     if method == "normal":
         benchmark.name = "Bernstein Vazirani"
-        circ = build_bv_circuit(secret_string)
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv.qasm"))
     else:
         benchmark.name = "Bernstein Vazirani (mid-circuit measurement)"
-        circ = build_bv_circuit(secret_string, mid_circuit_measure=True)
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv_mcm.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
+
+
+if __name__ == "__main__":
+    secret_string = "110011"
+    build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
+    build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
