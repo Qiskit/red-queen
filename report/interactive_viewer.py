@@ -31,12 +31,7 @@ def main(path, framework="dtale"):
     df = pd.json_normalize(result_data_list, record_path=["benchmarks"], meta=["file"])
 
     session = eda.show(df)
-    # check whether we are in notebook
-    try:
-        get_ipython().__class__.__name__
-    except NameError:
-        print("jupyter notebook not detected...attempting to open in browser")
-        session.open_browser()
+    session.open_browser()
 
 
 if __name__ == "__main__":

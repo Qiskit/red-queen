@@ -48,6 +48,13 @@ use:
 ```bash
 python -m report.console_tables --storage results/0001_bench.json
 ```
+To see the results in a web browser you can use:
+```bash
+python reports/interactive_viewer.py <path>
+```
+where "path" is a JSON results file or a directory containing the JSON results
+files. If using a directory, it is assummed all the data in the directory have
+the same result format.
 
 ## Warning
 This code is still under development. There are many razer sharp edges.
