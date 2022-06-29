@@ -72,6 +72,5 @@ def bench_qiskit_bv(benchmark, optimization_level, backend, method):
 
 
 if __name__ == "__main__":
-    secret_string = "110011"
     build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
     build_bv_circuit(SECRET_STRING, True).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
