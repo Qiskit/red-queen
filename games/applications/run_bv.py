@@ -40,16 +40,17 @@ def build_bv_circuit(secret_string, mid_circuit_measure=False):
         qr = QuantumRegister(2)
         cr = ClassicalRegister(input_size)
         qc = QuantumCircuit(qr, cr, name="main")
-        qc.x(qr[1])
-        qc.h(qr[1])
-        qc.barrier()
         for i in range(input_size):
+            qc.x(qr[1])
+            qc.h(qr[1])
+            qc.barrier()
             if secret_string[input_size - 1 - i] == "1":
                 qc.h(qr[0])
                 qc.cx(qr[0], qr[1])
                 qc.h(qr[0])
             qc.measure(qr[0], cr[i])
             qc.reset([0])
+            qc.reset([1])
     return qc
 
 
@@ -73,4 +74,4 @@ def bench_qiskit_bv(benchmark, optimization_level, backend, method):
 if __name__ == "__main__":
     secret_string = "110011"
     build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
-    build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
+    build_bv_circuit(SECRET_STRING, True).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
