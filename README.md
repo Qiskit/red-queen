@@ -42,7 +42,7 @@ To run pytest on Windows, you will have to use `python -m` in order to run the
 `pytest` command. You will also need to add `-s` to your pytest call to disable 
 stdin handling.
 ```bash
-python -m pytest -s games/mapping/map_queko.py -m qiskit --store
+python -m pytest -s games/mapping/map_queko.py -m tweedledum --store
 ```
 
 The benchmark suite will consider all functions named `bench_*` in 
