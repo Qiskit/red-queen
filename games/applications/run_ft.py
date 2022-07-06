@@ -82,13 +82,9 @@ def generate_ft_circuit_2(integer_value):
 @pytest.mark.parametrize("method", ["1", "2"])
 def bench_qiskit_ft(benchmark, optimization_level, backend, method):
     shots = 65536
-    binary = format(SECRET_INT, "b")
-<<<<<<< HEAD
-    binary_inc = format((SECRET_INT+1)%(2**(len(binary))), "b").zfill(len(binary))
+    binary = format(SECRET_INT, "b") # Convert secret number to binary
+    binary_inc = format((SECRET_INT+1)%(2**(len(binary))), "b").zfill(len(binary)) # secret int + 1 in binary (handles overflow)
     expected_counts = { binary_inc : shots} if method == "1" else {binary : shots}
-=======
-    expected_counts = { format((SECRET_INT+1)%(2**(len(binary))), "b").zfill(len(binary)) : shots} if method == "1" else {format(SECRET_INT, "b") : shots}
->>>>>>> 4725c09ae1bc1f2c81b9f0ab414190e3e4434962
     if method == "1":
         benchmark.name = "Quantum Fourier Transform v1"
         circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, f"ft_1_{SECRET_INT}.qasm"))
