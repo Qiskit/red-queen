@@ -1,7 +1,7 @@
 import numpy as np
 from qiskit import QuantumCircuit
 import pytest
-from __init__ import backends, run_qiskit_circuit
+from . import backends, run_qiskit_circuit
 import os
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
