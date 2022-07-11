@@ -28,6 +28,7 @@ class BenchmarkInfo:
         self._id = node._nodeid
         self.name = None
         self.tool = self._tool_name(node.name)
+        self.tool_version = "unknown"
         self.algorithm = "default"
         self._time_data = []
         self.quality_stats = {}
@@ -40,6 +41,7 @@ class BenchmarkInfo:
             "id": self._id,
             "name": self.name,
             "tool": self.tool,
+            "tool_version": self.tool_version,
             "algorithm": self.algorithm,
             "stats": {
                 "timing": dict((field, getattr(self, field)) for field in self._fields()),
