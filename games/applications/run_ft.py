@@ -26,24 +26,24 @@ def generate_ft_circuit_1(integer_value):
     qc = QuantumCircuit(qubits, bits, name="main")
     for digit, number in enumerate(binary):
         if number == "1":
-            qc.x((len(qubits)-1) - digit)
+            qc.x((len(qubits) - 1) - digit)
     qc.barrier()
     # Let's try and recreate the quantum Fourier Transform SubCircuit
-    for qubit in range(len(qubits)-1, -1, -1):
+    for qubit in range(len(qubits) - 1, -1, -1):
         qc.h(qubit)
         if not qubit == 0:
-            for subqubit in range(len(qubits)-1, qubit-1, -1):
-                qc.crz(np.pi/np.power(2, subqubit-(qubit - 1)), subqubit-1, subqubit)
+            for subqubit in range(len(qubits) - 1, qubit - 1, -1):
+                qc.crz(np.pi / np.power(2, subqubit - (qubit - 1)), subqubit - 1, subqubit)
     qc.barrier()
     # We can continue implementing our gates:
     for qubit in range(len(qubits)):
-        qc.rz(np.pi/np.power(2, qubit), qubit)
+        qc.rz(np.pi / np.power(2, qubit), qubit)
     qc.barrier()
     # Finally we the QFT circuit backwards by negating previous rotations.
     for qubit in range(len(qubits)):
         if not qubit == 0:
             for subqubit in range(qubit, len(qubits)):
-                qc.crz((-1)*np.pi/np.power(2, subqubit-(qubit - 1)), subqubit-1, subqubit)
+                qc.crz((-1) * np.pi / np.power(2, subqubit - (qubit - 1)), subqubit - 1, subqubit)
         qc.h(qubit)
     qc.barrier()
     # We can now measure and return the circuit
@@ -61,12 +61,12 @@ def generate_ft_circuit_2(integer_value):
         qc.h(qubit)
     qc.barrier()
     for qubit in range(len(qubits)):
-        qc.rz(integer_value*np.pi/np.power(2, qubit), qubit)
+        qc.rz(integer_value * np.pi / np.power(2, qubit), qubit)
     qc.barrier()
     for qubit in range(len(qubits)):
         if not qubit == 0:
             for subqubit in range(qubit, len(qubits)):
-                qc.crz((-1)*np.pi/np.power(2, subqubit-(qubit - 1)), subqubit-1, subqubit)
+                qc.crz((-1) * np.pi / np.power(2, subqubit - (qubit - 1)), subqubit - 1, subqubit)
         qc.h(qubit)
     qc.barrier()
     for qubit in range(len(qubits)):
@@ -81,7 +81,7 @@ def generate_ft_circuit_2(integer_value):
 def bench_qiskit_ft(benchmark, optimization_level, backend, method):
     shots = 65536
     binary = format(SECRET_INT, "b")
-    binary_1 = format((SECRET_INT+1) % (2**(len(binary))), "b").zfill(len(binary))
+    binary_1 = format((SECRET_INT + 1) % (2 ** (len(binary))), "b").zfill(len(binary))
     expected_counts = {binary_1: shots} if method == "1" else {binary: shots}
     if method == "1":
         benchmark.name = "Quantum Fourier Transform v1"
@@ -94,5 +94,9 @@ def bench_qiskit_ft(benchmark, optimization_level, backend, method):
 
 
 if __name__ == "__main__":
-    generate_ft_circuit_1(SECRET_INT).qasm(filename=os.path.join(QASM_DIR, f"ft_1_{SECRET_INT}.qasm"))
-    generate_ft_circuit_2(SECRET_INT).qasm(filename=os.path.join(QASM_DIR, f"ft_2_{SECRET_INT}.qasm"))
+    generate_ft_circuit_1(SECRET_INT).qasm(
+        filename=os.path.join(QASM_DIR, f"ft_1_{SECRET_INT}.qasm")
+    )
+    generate_ft_circuit_2(SECRET_INT).qasm(
+        filename=os.path.join(QASM_DIR, f"ft_2_{SECRET_INT}.qasm")
+    )
