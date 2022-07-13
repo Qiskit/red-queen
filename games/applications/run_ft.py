@@ -14,7 +14,7 @@ import numpy as np
 # Importing standard Qiskit libraries
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
-DIRECTORY = "qasm\\qft\\"
+DIRECTORY = "qasm/qft"
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY)
 SECRET_INT = random.randint(1, 20)
 
