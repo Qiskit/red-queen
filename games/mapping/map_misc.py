@@ -6,7 +6,7 @@
 """Misc mapping benchmarks."""
 
 import pytest
-from qiskit.test.mock import FakeMontreal
+from qiskit.providers.fake_provider import FakeMontreal
 
 from mapping import run_qiskit_mapper, run_tweedledum_mapper
 from benchmarks import misc_qasm
