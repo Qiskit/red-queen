@@ -6,7 +6,6 @@
 """Benchmark for Quantum Fourier Transform"""
 
 import os
-import random
 import pytest
 from applications import backends, run_qiskit_circuit
 import numpy as np
@@ -14,19 +13,18 @@ import numpy as np
 # Importing standard Qiskit libraries
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
-DIRECTORY = "qasm/qft"
+DIRECTORY = "qasm"
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY)
-SECRET_INT = random.randint(1, 20)
+SECRET_STRING = "110100"
 
 
-def generate_ft_circuit_1(integer_value):
-    binary = format(integer_value, "b")
-    qubits = QuantumRegister(len(binary))
-    bits = ClassicalRegister(len(binary))
+def generate_ft_circuit_1(binary):
+    qubits = QuantumRegister(len(binary) + 1)
+    bits = ClassicalRegister(len(binary) + 1)
     qc = QuantumCircuit(qubits, bits, name="main")
     for digit, number in enumerate(binary):
         if number == "1":
-            qc.x((len(qubits) - 1) - digit)
+            qc.x((len(qubits) - 2) - digit)
     qc.barrier()
     # Let's try and recreate the quantum Fourier Transform SubCircuit
     for qubit in range(len(qubits) - 1, -1, -1):
@@ -52,10 +50,10 @@ def generate_ft_circuit_1(integer_value):
     return qc
 
 
-def generate_ft_circuit_2(integer_value):
-    binary = format(integer_value, "b")
-    qubits = QuantumRegister(len(binary))
-    bits = ClassicalRegister(len(binary))
+def generate_ft_circuit_2(binary):
+    integer_value = int(binary, 2)
+    qubits = QuantumRegister(len(binary) + 1)
+    bits = ClassicalRegister(len(binary) + 1)
     qc = QuantumCircuit(qubits, bits, name="main")
     for qubit in range(len(qubits)):
         qc.h(qubit)
@@ -80,23 +78,22 @@ def generate_ft_circuit_2(integer_value):
 @pytest.mark.parametrize("method", ["1", "2"])
 def bench_qiskit_ft(benchmark, optimization_level, backend, method):
     shots = 65536
-    binary = format(SECRET_INT, "b")
-    binary_1 = format((SECRET_INT + 1) % (2 ** (len(binary))), "b").zfill(len(binary))
-    expected_counts = {binary_1: shots} if method == "1" else {binary: shots}
+    integer_value = int(SECRET_STRING, 2)
+    binary_1 = format((integer_value + 1), "b").zfill(len(SECRET_STRING) + 1)
+    expected_counts = (
+        {binary_1: shots} if method == "1" else {SECRET_STRING.zfill(len(SECRET_STRING) + 1): shots}
+    )
+    # print(expected_counts)
     if method == "1":
         benchmark.name = "Quantum Fourier Transform v1"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, f"ft_1_{SECRET_INT}.qasm"))
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_1.qasm"))
     else:
         benchmark.name = "Quantum Fourier Transform v2"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, f"ft_2_{SECRET_INT}.qasm"))
+        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_2.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
 
 if __name__ == "__main__":
-    generate_ft_circuit_1(SECRET_INT).qasm(
-        filename=os.path.join(QASM_DIR, f"ft_1_{SECRET_INT}.qasm")
-    )
-    generate_ft_circuit_2(SECRET_INT).qasm(
-        filename=os.path.join(QASM_DIR, f"ft_2_{SECRET_INT}.qasm")
-    )
+    generate_ft_circuit_1(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "ft_1.qasm"))
+    generate_ft_circuit_2(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "ft_2.qasm"))
