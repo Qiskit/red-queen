@@ -8,7 +8,7 @@
 import pytest
 
 from mapping import run_qiskit_mapper, run_tweedledum_mapper, run_tket_mapper
-from benchmarks import queko_qasm, queko_coupling
+from .benchmarks import queko_qasm, queko_coupling
 
 
 @pytest.mark.qiskit
