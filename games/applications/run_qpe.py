@@ -1,16 +1,27 @@
 
 import os
 import pytest
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-#from applications import backends, run_qiskit_circuit
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister,BasicAer
+from qiskit import IBMQ, Aer, transpile, assemble
+from applications import backends, run_qiskit_circuit
 import numpy as np
 import math
 
-QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm/qpe")
-SECRET_ANGLE = 1/16
-NUMQUBITS = np.random.randint(3,7)
+QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm/qpe/")
+SECRET_ANGLE = 1/8
+NUMQUBITS = 3
 
-#This will convert the fraction into binary for the secret angle 
+# qpe3 = Quantum_Phase_Estimation(NUMQUBITS,SECRET_ANGLE)
+# aer_sim = Aer.get_backend('aer_simulator')
+# shots = 4096
+# t_qpe3 = transpile(qpe3, aer_sim)
+# qobj = assemble(t_qpe3, shots=shots)
+# results = aer_sim.run(qobj).result()
+# answer = results.get_counts()
+
+
+#This will convert t
+#he fraction into binary for the secret angle 
 def fraction_bin(num, precision=10):
     binary = ""
     while (precision and num != 0):
@@ -37,13 +48,13 @@ def qft_dagger(qc, n):
         qc.h(j)
 
 #Construct the phase gates and include matching gate representation as readme circuit
-def CPhase(angle, exponent):
+# def CPhase(angle, exponent):
 
-    qc = QuantumCircuit(1, name=f"U^{exponent}")
-    qc.p(angle*exponent, 0)
-    phase_gate = qc.to_gate().control(1)
+#     qc = QuantumCircuit(1, name=f"U^{exponent}")
+#     qc.cp(angle*exponent, 0)
+#     phase_gate = qc.to_gate().control(1)
 
-    return phase_gate, qc
+#     return phase_gate, qc
 
 def Quantum_Phase_Estimation(num_of_qubits, angle):
     
@@ -66,14 +77,30 @@ def Quantum_Phase_Estimation(num_of_qubits, angle):
     
     #Phase of QFT
     Phase = 2*math.pi*angle
+
+    # gate_qc = QuantumCircuit(1)
+    # gate_qc.p(math.pi / 4, 0)
+    # phase_gate = gate_qc.to_gate().control(1)
+
+    # qc = QuantumCircuit(1)
+    # qc.append(phase_gate, 0)
+
+    # gate_qc = QuantumCircuit(1)
+    # gate_qc.p(math.pi / 8)
+    # phase_gate = gate_qc.to_gate().control(1)
+
+    # qc = QuantumCircuit(1)
+    # qc.append(phase_gate, 0)
+    # #qc.qasm()
     
     for j in (range(Cqubits)):
-        cp,Pgate= CPhase(Phase, repetition)
-        qc.append(cp, [j, Cqubits])
+        #cp,Pgate= CPhase(Phase, repetition)
+        #qc.append(cu, [j, Cqubits])
+        qc.cp(Phase * repetition, j, Cqubits )
         repetition *= 2
    
     #define your Unitary gate 
-    Pgate,U = CPhase(Phase, repetition)
+    #Pgate,U = CPhase(Phase, repetition)
           
     qc.barrier()  
    
@@ -89,7 +116,7 @@ def Quantum_Phase_Estimation(num_of_qubits, angle):
 
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
-#@pytest.mark.parametrize("backend", backends)
+@pytest.mark.parametrize("backend", backends)
 def bench_qiskit_bv(benchmark, optimization_level, backend):
     shots = 65536
     expected_counts = {fraction_bin(SECRET_ANGLE): shots}
@@ -101,4 +128,5 @@ def bench_qiskit_bv(benchmark, optimization_level, backend):
 
 if __name__ == "__main__":
     Quantum_Phase_Estimation(NUMQUBITS,SECRET_ANGLE).qasm(filename=os.path.join(QASM_DIR, f"qpe{NUMQUBITS}.qasm"))
-
+    
+    #Quantum_Phase_Estimation(i, SECRET_ANGLE).qasm(filename=os.path.join(QASM_DIR, f"qpe{i}.qasm"))
