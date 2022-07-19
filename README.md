@@ -56,6 +56,11 @@ use:
 ```bash
 python -m report.console_tables --storage results/0001_bench.json
 ```
+To see `games/applications` results as a bar graph, run:
+```bash
+python view.py <JSON FILE> <DATA TYPE>
+```
+Currently supported datatypes are `fidelity`, which gives average fidelity for each benchmark, and `meantime`, which gives the average time for each benchmark. 
 
 ## Warning
 This code is still under development. There are many razer sharp edges.
