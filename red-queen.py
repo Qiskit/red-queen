@@ -64,7 +64,7 @@ def main():
                         if set(args.benchmark).issubset(set(benchmark_category[args.benchmarkType[i]])):
                             print("passed test 4")
                             print(f"run {args.benchmark}")
-                            codeRan = subprocess.run([f"python -m pytest -s {benchmark_category[args.benchmarkType[i]][args.benchmark[i]]} -m {args.compiler} --store"],shell=True)
+                            codeRan = subprocess.run([f"pytest {benchmark_category[args.benchmarkType[i]][args.benchmark[i]]} -m {args.compiler} --store"],shell=True)
                             i +=1
                         else:
                             parser.error(f"For the {args.benchmarkType} benchmark type you can only these benchmarks:\x1B[3m{benchmark_category[args.benchmarkType]}\x1B[0m")
