@@ -29,14 +29,14 @@ def balanced(n):
     qc = QuantumCircuit(n + 1)
     b = np.random.randint(1, 2**n)
     bstr = format(b, "0" + str(n) + "b")
-    for qubit in enumerate(bstr):
-        if bstr[qubit] == "1":
-            qc.x(qubit)
+    for i, qubit in enumerate(bstr):
+        if qubit == "1":
+            qc.x(i)
     for qubit in range(n):
         qc.cx(qubit, n)
-    for qubit in enumerate(bstr):
-        if bstr[qubit] == "1":
-            qc.x(qubit)
+    for i, qubit in enumerate(bstr):
+        if qubit == "1":
+            qc.x(i)
     b_oracle = qc.to_gate()
     b_oracle.name = "Slayyy Oracle"
     return b_oracle

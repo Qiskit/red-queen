@@ -1,6 +1,6 @@
 OPENQASM 2.0;
 include "qelib1.inc";
-gate gate_Slayyy_Oracle q0,q1,q2,q3,q4,q5 { x q0; x q3; x q4; cx q0,q5; cx q1,q5; cx q2,q5; cx q3,q5; cx q4,q5; x q0; x q3; x q4; }
+gate gate_Slayyy_Oracle q0,q1,q2,q3,q4,q5 { x q0; x q1; x q3; x q4; cx q0,q5; cx q1,q5; cx q2,q5; cx q3,q5; cx q4,q5; x q0; x q1; x q3; x q4; }
 qreg q[6];
 creg c[5];
 x q[5];
