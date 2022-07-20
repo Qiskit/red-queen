@@ -1,14 +1,14 @@
+"""Quantum Phase Estimation"""
 
 import os
-import pytest
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister,BasicAer
-from qiskit import IBMQ, Aer, transpile, assemble
-from applications import backends, run_qiskit_circuit
-import numpy as np
 import math
+import pytest
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from applications import backends, run_qiskit_circuit
+
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm/qpe/")
-SECRET_ANGLE = 1/8
+SECRET_ANGLE = 1 / 8
 NUMQUBITS = 3
 
 # qpe3 = Quantum_Phase_Estimation(NUMQUBITS,SECRET_ANGLE)
@@ -20,34 +20,34 @@ NUMQUBITS = 3
 # answer = results.get_counts()
 
 
-#This will convert t
-#he fraction into binary for the secret angle 
+# This will convert the fraction into binary for the secret angle
 def fraction_bin(num, precision=10):
     binary = ""
-    while (precision and num != 0):
+    while precision and num != 0:
         num *= 2
         bit = int(num)
-        if (bit == 1) :   
-            num -= bit  
-            binary += '1'
-        else : 
-            binary += '0'
+        if bit == 1:
+            num -= bit
+            binary += "1"
+        else:
+            binary += "0"
         precision -= 1
     return binary
 
 
-#Inverse QFT Function 
+# Inverse QFT Function
 def qft_dagger(qc, n):
     """n-qubit QFTdagger the first n qubits in circ"""
     # Don't forget the Swaps!
-    for qubit in range(n//2):
-        qc.swap(qubit, n-qubit-1)
+    for qubit in range(n // 2):
+        qc.swap(qubit, n - qubit - 1)
     for j in range(n):
         for m in range(j):
-            qc.cp(-math.pi/float(2**(j-m)), m, j)
+            qc.cp(-math.pi / float(2 ** (j - m)), m, j)
         qc.h(j)
 
-#Construct the phase gates and include matching gate representation as readme circuit
+
+# Construct the phase gates and include matching gate representation as readme circuit
 # def CPhase(angle, exponent):
 
 #     qc = QuantumCircuit(1, name=f"U^{exponent}")
@@ -56,27 +56,28 @@ def qft_dagger(qc, n):
 
 #     return phase_gate, qc
 
-def Quantum_Phase_Estimation(num_of_qubits, angle):
-    
-    Cqubits = num_of_qubits - 1 #there is one less for the counting qubits
-  
-    #setting up the circuit
+
+def quantum_phase_estimation(num_of_qubits, angle):
+
+    cqubits = num_of_qubits - 1  # there is one less for the counting qubits
+
+    # setting up the circuit
     qr = QuantumRegister(num_of_qubits)
-    cr = ClassicalRegister(Cqubits)
+    cr = ClassicalRegister(cqubits)
     qc = QuantumCircuit(qr, cr)
-    
-    #initialize the state
-    qc.x(Cqubits)
-    
-    #next apply the Hadmard gate to put the qubits in superposition
-    for qubit in range(Cqubits):
+
+    # initialize the state
+    qc.x(cqubits)
+
+    # next apply the Hadmard gate to put the qubits in superposition
+    for qubit in range(cqubits):
         qc.h(qr[qubit])
-        
-    #next apply the controlled unitary operation. this applies a phase to only the |1> state. 
+
+    # next apply the controlled unitary operation. this applies a phase to only the |1> state.
     repetition = 1
-    
-    #Phase of QFT
-    Phase = 2*math.pi*angle
+
+    # Phase of QFT
+    phase_ = 2 * math.pi * angle
 
     # gate_qc = QuantumCircuit(1)
     # gate_qc.p(math.pi / 4, 0)
@@ -92,27 +93,29 @@ def Quantum_Phase_Estimation(num_of_qubits, angle):
     # qc = QuantumCircuit(1)
     # qc.append(phase_gate, 0)
     # #qc.qasm()
-    
-    for j in (range(Cqubits)):
-        #cp,Pgate= CPhase(Phase, repetition)
-        #qc.append(cu, [j, Cqubits])
-        qc.cp(Phase * repetition, j, Cqubits )
+
+    for j in range(cqubits):
+        # cp,Pgate= CPhase(Phase, repetition)
+        # qc.append(cu, [j, cqubits])
+        qc.cp(phase_ * repetition, j, cqubits)
         repetition *= 2
-   
-    #define your Unitary gate 
-    #Pgate,U = CPhase(Phase, repetition)
-          
-    qc.barrier()  
-   
-    #Now apply the inverse QFT
-    qft_dagger(qc, Cqubits)
-    
-    #Lastly measure it 
-    qc.measure([qr[m] for m in range(Cqubits)], list(range(Cqubits)))
+
+    # define your Unitary gate
+    # Pgate,U = CPhase(Phase, repetition)
+
+    qc.barrier()
+
+    # Now apply the inverse QFT
+    qft_dagger(qc, cqubits)
+
+    # Lastly measure it
+    qc.measure([qr[m] for m in range(cqubits)], list(range(cqubits)))
 
     return qc
 
-#Benchmarking
+
+# Benchmarking
+
 
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
@@ -127,6 +130,8 @@ def bench_qiskit_bv(benchmark, optimization_level, backend):
 
 
 if __name__ == "__main__":
-    Quantum_Phase_Estimation(NUMQUBITS,SECRET_ANGLE).qasm(filename=os.path.join(QASM_DIR, f"qpe{NUMQUBITS}.qasm"))
-    
-    #Quantum_Phase_Estimation(i, SECRET_ANGLE).qasm(filename=os.path.join(QASM_DIR, f"qpe{i}.qasm"))
+    quantum_phase_estimation(NUMQUBITS, SECRET_ANGLE).qasm(
+        filename=os.path.join(QASM_DIR, f"qpe{NUMQUBITS}.qasm")
+    )
+
+    # Quantum_Phase_Estimation(i, SECRET_ANGLE).qasm(filename=os.path.join(QASM_DIR, f"qpe{i}.qasm"))
