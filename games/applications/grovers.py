@@ -251,7 +251,7 @@ def grovers_dist(num_qubits, marked_item, n_iterations):
 def bench_qiskit_grovers(benchmark, optimization_level, backend):
     """This code is what is used to benchmark grover's search algorithm"""
     shots = 70000
-    expected_counts = {format(14, "b").zfill(5): shots}
+    expected_counts = {format(SECRET_STATE, "b").zfill(QUBIT_COUNT): shots}
     benchmark.name = "Grover's Search Algorithm"
     circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "grover.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
