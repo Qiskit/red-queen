@@ -43,7 +43,7 @@ def run_qiskit_circuit(benchmark, circuit, backend, optimization_level, shots, e
     info.quality_stats["depth"] = tqc.depth()
     info.quality_stats["size"] = tqc.size()
     op_count = tqc.count_ops()
-    num_2q = op_count["cx"]
+    num_2q = op_count.get("cx", 0)
     if "melbourne" in backend.name() or "rochester" in backend.name():
         num_1q = op_count.get("u1", 0) + op_count.get("u2", 0) + op_count.get("u3", 0)
     else:
