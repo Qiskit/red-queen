@@ -1,7 +1,14 @@
 # ------------------------------------------------------------------------------
-# Part of Red Queen Project.  This file is distributed under the MIT License.
+# Part of Red Queen Project.  This file is distributed under the Apache License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
+
+# This benchmark was implemented based on the folliwng paper:
+
+# title: "Application-Oriented Performance Benchmarks for Quantum Computing"
+# date-released: 2021-10-7
+# url: "https://arxiv.org/abs/2110.03137"
+# github repository: https://github.com/SRI-International/QC-App-Oriented-Benchmarks
 
 """Benchmark for Quantum Fourier Transform"""
 
@@ -13,18 +20,22 @@ import numpy as np
 # Importing standard Qiskit libraries
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
+
 DIRECTORY = "qasm"
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY)
-SECRET_STRING = "110100"
+SECRET_STRING = "11111111"
+
+
+""" Generates Quantum Fourier Transform circuit using QFT and Inverse QFT"""
 
 
 def generate_ft_circuit_1(binary):
-    qubits = QuantumRegister(len(binary) + 1)
-    bits = ClassicalRegister(len(binary) + 1)
-    qc = QuantumCircuit(qubits, bits, name="main")
+    qubits = QuantumRegister(len(binary))
+    bits = ClassicalRegister(len(binary))
+    qc = QuantumCircuit(qubits, bits, name="FT1")
     for digit, number in enumerate(binary):
         if number == "1":
-            qc.x((len(qubits) - 2) - digit)
+            qc.x((len(qubits) - 1) - digit)
     qc.barrier()
     # Let's try and recreate the quantum Fourier Transform SubCircuit
     for qubit in range(len(qubits) - 1, -1, -1):
@@ -52,9 +63,9 @@ def generate_ft_circuit_1(binary):
 
 def generate_ft_circuit_2(binary):
     integer_value = int(binary, 2)
-    qubits = QuantumRegister(len(binary) + 1)
-    bits = ClassicalRegister(len(binary) + 1)
-    qc = QuantumCircuit(qubits, bits, name="main")
+    qubits = QuantumRegister(len(binary))
+    bits = ClassicalRegister(len(binary))
+    qc = QuantumCircuit(qubits, bits, name="FT2")
     for qubit in range(len(qubits)):
         qc.h(qubit)
     qc.barrier()
@@ -79,10 +90,10 @@ def generate_ft_circuit_2(binary):
 def bench_qiskit_ft(benchmark, optimization_level, backend, method):
     shots = 65536
     integer_value = int(SECRET_STRING, 2)
-    binary_1 = format((integer_value + 1), "b").zfill(len(SECRET_STRING) + 1)
-    expected_counts = (
-        {binary_1: shots} if method == "1" else {SECRET_STRING.zfill(len(SECRET_STRING) + 1): shots}
+    binary_1 = format((integer_value + 1) % (2 ** (len(SECRET_STRING))), "b").zfill(
+        len(SECRET_STRING)
     )
+    expected_counts = {binary_1: shots} if method == "1" else {SECRET_STRING: shots}
     # print(expected_counts)
     if method == "1":
         benchmark.name = "Quantum Fourier Transform v1"
