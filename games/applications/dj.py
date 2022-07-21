@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------
 # Part of Red Queen Project.  This file is distributed under the Apache License.
 # See accompanying file /LICENSE for details.
@@ -16,7 +15,6 @@ from . import backends, run_qiskit_circuit
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 NUM = 5
-
 
 
 def constant(n):
