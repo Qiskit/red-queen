@@ -44,7 +44,7 @@
 Grover's Search Benchmark Program - Qiskit
 """
 import os
-
+import platform
 
 import pytest
 
@@ -56,8 +56,8 @@ QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 
 
 _USE_MCX_SHIM = False
-QUBIT_COUNT = 5
-SECRET_STATE = 14
+QubitCount = 4
+SECRET_STATE = 12
 
 
 np.random.seed(0)
@@ -252,7 +252,7 @@ def grovers_dist(num_qubits, marked_item, n_iterations):
 def bench_qiskit_grovers(benchmark, optimization_level, backend):
     ### This code is what is used to benchmark grover's search algorithm
     shots = 70000
-    expected_counts = {format(SECRET_STATE, "b").zfill(QUBIT_COUNT): shots}
+    expected_counts = {format(14, "b").zfill(5): shots}
     benchmark.name = "Grover's Search Algorithm"
     circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "grover.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
@@ -261,4 +261,4 @@ def bench_qiskit_grovers(benchmark, optimization_level, backend):
 
 if __name__ == "__main__":
     # saved circuits for display
-    grovers_search(QUBIT_COUNT, SECRET_STATE).qasm(filename=os.path.join(QASM_DIR, "grover.qasm"))
+    grovers_search(QubitCount, SECRET_STATE).qasm(filename=os.path.join(QASM_DIR, "grover.qasm"))
