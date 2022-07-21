@@ -1,3 +1,9 @@
+
+# ------------------------------------------------------------------------------
+# Part of Red Queen Project.  This file is distributed under the Apache License.
+# See accompanying file /LICENSE for details.
+# ------------------------------------------------------------------------------
+
 """Deustch Jozsa Benchmark Circuits"""
 
 
@@ -10,7 +16,7 @@ from . import backends, run_qiskit_circuit
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 NUM = 5
-# -----------------------------------------------------------------------------------
+
 
 
 def constant(n):
@@ -20,7 +26,7 @@ def constant(n):
     if output == 1:
         qc.x(n)
     c_oracle = qc.to_gate()
-    c_oracle.name = "Slayyy Oracle"
+    c_oracle.name = "Constant Oracle"
     return c_oracle
 
 
@@ -38,7 +44,7 @@ def balanced(n):
         if qubit == "1":
             qc.x(i)
     b_oracle = qc.to_gate()
-    b_oracle.name = "Slayyy Oracle"
+    b_oracle.name = "Balanced Oracle"
     return b_oracle
 
 
@@ -73,7 +79,6 @@ def build_dj(case, n):
     return dj
 
 
-# --------------------------------------------------------------------------------
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
