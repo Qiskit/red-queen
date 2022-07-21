@@ -44,7 +44,6 @@
 Grover's Search Benchmark Program - Qiskit
 """
 import os
-import platform
 
 import pytest
 
@@ -56,7 +55,7 @@ QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 
 
 _USE_MCX_SHIM = False
-QubitCount = 4
+QUBIT_COUNT = 4
 SECRET_STATE = 12
 
 
@@ -67,7 +66,7 @@ np.random.seed(0)
 
 
 def grovers_search(num_qubits, marked_item):
-    ### This function creates the grovers search algorithm circuit
+    """This function creates the grovers search algorithm circuit"""
     quantum_c = None
     n_iterations = int(np.pi * np.sqrt(2**num_qubits) / 4)
     # allocate qubits
@@ -107,7 +106,7 @@ def grovers_search(num_qubits, marked_item):
 
 
 def add_grover_oracle(num_qubits, marked_item):
-    ### This line of code creates the oracles needed for grover's circuit
+    """This line of code creates the oracles needed for grover's circuit"""
     grover_oracle = None
     marked_item_bits = format(marked_item, f"0{num_qubits}b")[::-1]
 
@@ -144,7 +143,7 @@ def add_grover_oracle(num_qubits, marked_item):
 
 
 def add_diffusion_operator(num_qubits):
-    ### This function creates the diffusion operator for grover's circuit
+    """This function creates the diffusion operator for grover's circuit"""
     diffusion_operator = None
     q_r = QuantumRegister(num_qubits)
     q_c = QuantumCircuit(q_r, name="diffuser")
@@ -180,7 +179,7 @@ def add_diffusion_operator(num_qubits):
 
 # single cx / cu1 unit for mcx implementation
 def add_cx_unit(q_c, cxcu1_unit, controls, target):
-    ### This function creates the MCX shim for grover's circuit
+    """This function creates the MCX shim for grover's circuit"""
     num_controls = len(controls)
     i_qubit = cxcu1_unit[1]
     j_qubit = cxcu1_unit[0]
@@ -209,7 +208,7 @@ def add_cx_unit(q_c, cxcu1_unit, controls, target):
 
 # mcx recursion loop
 def add_cxcu1_units(q_c, cxcu1_units, controls, target):
-    ### This function recursively creates the MCX shim for grover's circuit
+    """This function recursively creates the MCX shim for grover's circuit"""
     new_units = []
     for cxcu1_unit in cxcu1_units:
         new_units += add_cx_unit(q_c, cxcu1_unit, controls, target)
@@ -218,9 +217,9 @@ def add_cxcu1_units(q_c, cxcu1_units, controls, target):
 
 
 def add_mcx(q_c, controls, target):
-    ### mcx gate implementation: brute force and inefficent
-    ### start with a single CU1 on last control and target
-    ### and recursively expand for each additional control
+    """mcx gate implementation: brute force and inefficent
+    start with a single CU1 on last control and target
+    and recursively expand for each additional control"""
     num_controls = len(controls)
     theta = np.pi / 2**num_controls
     q_c.h(target)
@@ -232,7 +231,7 @@ def add_mcx(q_c, controls, target):
 
 # def grovers_search(num_qubits, marked_item, n_iterations)
 def grovers_dist(num_qubits, marked_item, n_iterations):
-    ### This function displays the qubit that gets amplified
+    """This function displays the qubit that gets amplified"""
     dist = {}
     for i in range(2**num_qubits):
         key = bin(i)[2:].zfill(num_qubits)
@@ -250,7 +249,7 @@ def grovers_dist(num_qubits, marked_item, n_iterations):
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
 def bench_qiskit_grovers(benchmark, optimization_level, backend):
-    ### This code is what is used to benchmark grover's search algorithm
+    """This code is what is used to benchmark grover's search algorithm"""
     shots = 70000
     expected_counts = {format(14, "b").zfill(5): shots}
     benchmark.name = "Grover's Search Algorithm"
@@ -261,4 +260,4 @@ def bench_qiskit_grovers(benchmark, optimization_level, backend):
 
 if __name__ == "__main__":
     # saved circuits for display
-    grovers_search(QubitCount, SECRET_STATE).qasm(filename=os.path.join(QASM_DIR, "grover.qasm"))
+    grovers_search(QUBIT_COUNT, SECRET_STATE).qasm(filename=os.path.join(QASM_DIR, "grover.qasm"))
