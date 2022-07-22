@@ -3,13 +3,9 @@
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
 
-
-"""
-My code was inspired from the paper cited above. It provided a lot of directionality for the
-structure of the code, however nothing is directly copied from it. 
-https://arxiv.org/pdf/2110.03137.pdf
- 
- """
+# My code was inspired from the paper cited above. It provided a lot of directionality for the
+# structure of the code, however nothing is directly copied from it.
+# https://arxiv.org/pdf/2110.03137.pdf
 
 """Quantum Phase Estimation"""
 
@@ -48,8 +44,8 @@ def fraction_bin(num, precision=10):
     return binary
 
 
-""" The inverse QFT function was taken from the qiskit textbook from the section discussing 
-Quantum Phase Estimation """
+# The inverse QFT function was taken from the qiskit textbook from the section discussing
+# Quantum Phase Estimation
 
 # Inverse QFT Function
 def qft_dagger(qc, n):
