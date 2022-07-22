@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# cff-version: 1.2.0
 # "This code below was adapted from the code created by the SRI-International organization."
 # The names listed below are the orginal authors of the code
 # authors:
