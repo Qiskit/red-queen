@@ -1,10 +1,12 @@
+
+
 """Hidden Shift Benchmark Circuit"""
 
 # initialization
 import os
 import pytest
 from qiskit import QuantumCircuit
-from applications import backends, run_qiskit_circuit
+# from applications import backends, run_qiskit_circuit
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 
@@ -39,11 +41,9 @@ def g_oracle(num_qubits, secret_string):
     oracle_g.append(the_shift(num_qubits, secret_string), range(num_qubits))
 
     # apply the oracle U_f = (-1)^f(x) = F(x)
-    # x·y corresponds to controlled-z gates between every qubit and its second qubit
     for i_qubit in range(int(num_qubits / 2)):
         oracle_g.cz(i_qubit, i_qubit + int(num_qubits / 2))
 
-    # h(x) = x·e_2 corresponds to the z gate applied to middle qubit
     oracle_g.z(int(num_qubits / 2) - 1)
 
     # undo the shift
@@ -60,12 +60,10 @@ def g_oracle(num_qubits, secret_string):
 def f_oracle(num_qubits):
     """oracle circuit that encodes Fourier Transform"""
     oracle_f = QuantumCircuit(num_qubits)
-
-    # x·y corresponds to controlled-z gates between every qubit and its second qubit
+    
     for i_qubit in range(int(num_qubits / 2)):
         oracle_f.cz(i_qubit, i_qubit + int(num_qubits / 2))
 
-    # h(y) = y·e_2, applies z gate to the second qubit of the last register.
     oracle_f.z(int(num_qubits - 1))
 
     # name oracle
@@ -108,20 +106,20 @@ def hs_circuit(num_qubits, secret_string):
 # ------------------------------------------------------------
 
 
-@pytest.mark.qiskit
-@pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
-@pytest.mark.parametrize("backend", backends)
-@pytest.mark.parametrize("method", ["with_QF"])
-def bench_qiskit_hs(benchmark, optimization_level, backend, method):
-    """benchmarking for hidden_shift"""
-    shots = 33333
-    expected_counts = {SECRET_STRING: shots}
-    if method == "with_QF":
-        benchmark.name = "Hidden Shift"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "hs.qasm"))
+# @pytest.mark.qiskit
+# @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
+# @pytest.mark.parametrize("backend", backends)
+# @pytest.mark.parametrize("method", ["with_QF"])
+# def bench_qiskit_hs(benchmark, optimization_level, backend, method):
+#     """benchmarking for hidden_shift"""
+#     shots = 33333
+#     expected_counts = {SECRET_STRING: shots}
+#     if method == "with_QF":
+#         benchmark.name = "Hidden Shift"
+#         circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "hs.qasm"))
 
-    benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
-    run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
+#     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
+#     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
 
 if __name__ == "__main__":
