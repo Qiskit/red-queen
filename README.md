@@ -96,10 +96,7 @@ python -m pytest -s games/mapping/map_queko.py -m tweedledum --store
 ```
 
 The benchmark suite will consider all functions named `bench_*` in
-`games/mapping/map_queko.py`. Because we set the `-m` option, only the the ones
-marked with `tweedledum` will be run. (We could easy do the same for `qiskit`).
-If you don't define a `-m` option, all `bench_*` functions will be run.
-
+`games/mapping/map_queko.py`. Because
 The `--store` option tells the framework to store the results in json file in
 the `results` directory. To see the results as a table, you can use the you can
 use:
