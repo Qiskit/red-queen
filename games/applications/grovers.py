@@ -17,30 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# "This code below was adapted from the code created by the SRI-International organization."
-# The names listed below are the orginal authors of the code
-# authors:
-#   - family-names: Lubinski
-#     given-names: Thomas
-#   - family-names: Johri
-#     given-names: Sonika
-#   - family-names: Varosy
-#     given-names: Paul
-#   - family-names: Coleman
-#     given-names: Jeremiah
-#   - family-names: Zhao
-#     given-names: Luning
-#   - family-names: Necaise
-#     given-names: Jason
-#   - family-names: Baldwin
-#     given-names: Charles
-#   - family-names: Mayer
-#     given-names: Karl
-#   - family-names: Proctor
-#     given-names: Timothy
-# title: "Application-Oriented Performance Benchmarks for Quantum Computing"
-# date-released: 2021-10-7
-# url: "https://arxiv.org/abs/2110.03137"
 # github repository:
 # https://github.com/SRI-International/q_c-App-Oriented-Benchmarks/blob/master/grovers/qiskit/grovers_benchmark.py
 
