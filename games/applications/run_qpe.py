@@ -104,14 +104,14 @@ def bench_qiskit_bv(benchmark, optimization_level, backend):
     shots = 65536
     expected_counts = {fraction_bin(SECRET_ANGLE): shots}
     benchmark.name = "Quantum Phase Estimation"
-    circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, f"qpe.qasm"))
+    circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "qpe.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
 
 if __name__ == "__main__":
     quantum_phase_estimation(NUMQUBITS, SECRET_ANGLE).qasm(
-        filename=os.path.join(QASM_DIR, f"qpe.qasm")
+        filename=os.path.join(QASM_DIR, "qpe.qasm")
     )
 
     # Quantum_Phase_Estimation(i, SECRET_ANGLE).qasm(filename=os.path.join(QASM_DIR, f"qpe{i}.qasm"))
