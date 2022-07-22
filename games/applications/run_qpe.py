@@ -75,13 +75,8 @@ def quantum_phase_estimation(num_of_qubits, angle):
     phase_ = 2 * math.pi * angle
 
     for j in range(cqubits):
-        # cp,Pgate= CPhase(Phase, repetition)
-        # qc.append(cu, [j, cqubits])
         qc.cp(phase_ * repetition, j, cqubits)
         repetition *= 2
-
-    # define your Unitary gate
-    # Pgate,U = CPhase(Phase, repetition)
 
     qc.barrier()
 
