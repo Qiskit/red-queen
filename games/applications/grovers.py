@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Part of Red Queen Project.  This file is distributed under the MIT License.
+# See accompanying file /LICENSE for details.
+# ------------------------------------------------------------------------------
+
 # Copyright 2022 SRI-International organization
 
 # Licensed under the Apache License, Version 2.0 (the "License");
