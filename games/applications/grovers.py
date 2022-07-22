@@ -18,8 +18,9 @@
 # limitations under the License.
 
 # github repository:
-# https://github.com/SRI-International/q_c-App-Oriented-Benchmarks/blob/master/grovers/qiskit/grovers_benchmark.py
-
+# https://github.com/Lementknight/QC-App-Oriented-Benchmarks/blob/master/grovers/qiskit/grovers_benchmark.py
+    # Variable names from functions were modified to comply with pylint recommendations, and original benchmark
+    # code was ommited as only grover's search algorithm's circuit construction was the only code neede
 """
 Grover's Search Benchmark Program - Qiskit
 """
