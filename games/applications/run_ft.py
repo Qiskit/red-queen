@@ -8,7 +8,7 @@
 # title: "Application-Oriented Performance Benchmarks for Quantum Computing"
 # date-released: 2021-10-7
 # url: "https://arxiv.org/abs/2110.03137"
-# github repository: https://github.com/SRI-International/QC-App-Oriented-Benchmarks
+# Content used: Circuits described in figures 25, 26 and 27.
 
 """Benchmark for Quantum Fourier Transform"""
 
