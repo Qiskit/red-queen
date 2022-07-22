@@ -68,7 +68,7 @@ python red-queen.py -c tweedledum -t mapping -b map_queko.py
 With `pytest`
 
 ```bash
-python -m pytest games/mapping/map_queko.py -m tweedledum --store
+python pytest games/mapping/map_queko.py -m tweedledum --store
 ```
 
 <br>

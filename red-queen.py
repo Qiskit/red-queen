@@ -32,6 +32,17 @@ def benchmarkRetrieval():
             benchmarks.append(keys)
     return benchmark_category, benchmark_types, benchmarks, user_os
 
+# def resultRetrieval():
+#     i = 0
+#     results = {}
+#     dir_path = "results"
+#     for entry in os.scandir(dir_path):
+#         print(entry.name,entry.path)
+#         if entry.name.endswith('.json') and entry.is_file():
+#             results[i] = {entry.name:entry.path}
+#             i += 1
+#     print(results)
+#     return results
 
 def main():
     benchmark_category, benchmark_types, benchmarks, user_os = benchmarkRetrieval()
@@ -88,9 +99,16 @@ def main():
                                 print(
                                     f"If you want to view the results chart type:\npython -m report.console_tables --storage results/<latest_number>_bench.json"
                                     )
-                                # codeRan = subprocess.run(
+                                # subprocess.run(
                                 #     [
                                 #         f"{user_os}pytest {benchmark_category[args.benchmarkType[i]][args.benchmark[i]]} -m {args.compiler} --store"
+                                #     ],
+                                #     shell=True,
+                                # )
+                                # resultsDict, resultsIndex = resultRetrieval()
+                                # subprocess.run(
+                                #     [
+                                #         f"python -m report.console_tables -storage "
                                 #     ],
                                 #     shell=True,
                                 # )
@@ -129,4 +147,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # resultRetrieval()
     main()
