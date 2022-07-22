@@ -1,3 +1,16 @@
+# ------------------------------------------------------------------------------
+# Part of Red Queen Project.  This file is distributed under the Apache License.
+# See accompanying file /LICENSE for details.
+# ------------------------------------------------------------------------------
+
+
+"""
+My code was inspired from the paper cited above. It provided a lot of directionality for the
+structure of the code, however nothing is directly copied from it. 
+https://arxiv.org/pdf/2110.03137.pdf
+ 
+ """
+
 """Quantum Phase Estimation"""
 
 import os
@@ -34,6 +47,9 @@ def fraction_bin(num, precision=10):
         precision -= 1
     return binary
 
+
+""" The inverse QFT function was taken from the qiskit textbook from the section discussing 
+Quantum Phase Estimation """
 
 # Inverse QFT Function
 def qft_dagger(qc, n):
