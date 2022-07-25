@@ -35,10 +35,10 @@ def the_shift(num_qubits, secret_string):
     for i_qubit in range(num_qubits):
         if secret_string[i_qubit] == "0":  # skips every secret_string qubit == 0
             continue
-    shift.x(i_qubit)  # applies x gate to secret_string qubit == 1, shifts the qubits
+    else:
+        shift.x(i_qubit)  # applies x gate to secret_string qubit == 1, shifts the qubits
     shift.name = "Shift"
     return shift
-
 
 # -------------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,6 @@ def g_oracle(num_qubits, secret_string):
     oracle_g.name = "Oracle g"
     return oracle_g
 
-
 # -------------------------------------------------------------------------------------------------------
 
 def f_oracle(num_qubits):
@@ -77,7 +76,6 @@ def f_oracle(num_qubits):
     # name oracle
     oracle_f.name = "Oracle f"
     return oracle_f
-
 
 # -------------------------------------------------------------------------------------------------------
 
@@ -108,7 +106,6 @@ def hs_circuit(num_qubits, secret_string):
         hs.measure(i_qubit, i_qubit)
 
     return hs
-
 
 # -------------------------------------------------------------------------------------------------------
 
