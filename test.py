@@ -60,6 +60,16 @@ def resultRetrieval():
     # print(results)
     return results
 
+def runBenchmarks(pytestPaths: str, windows_ad1:str, mTag:str, compiler:str):
+    click.echo("benchmarks ran")
+    subprocess.run([f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"], shell=True,)
+
+def showResult():
+    resultsDict = resultRetrieval()
+    resultNum = max(resultsDict.keys())
+    subprocess.run([f"python -m report.console_tables --storage results/000{resultNum}_bench.json"],shell=True,)
+    click.echo(resultNum)
+    click.echo(f"If you want to view the results chart type:\npython -m report.console_tables --storage results/{format(resultNum).zfill(4)}_bench.json")
 
 benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2 = benchmarkRetrieval()
 complierList = complierRetrieval()
@@ -92,16 +102,18 @@ complierList = complierRetrieval()
     help="enter the specfic benchmark(s) here",
 )
 def main(compiler, benchmarkType, benchmark):
-    # click.echo(list(compiler))
-    # click.echo(list(benchmarkType))
-    click.echo(list(benchmark))
-    benchmarkPaths = ""
+    benchmarkPaths = []
+    pytestPaths = ""
+    myDict = {}
+    mTag = ""
     if len(compiler) > 0:
         mTag = "-m "
+        compiler = compiler[0]
     else:
         compiler = ""
     # ### This for loop ensures that we are able to run various benchmark types
     i = 0
+    j = 0
     ### Has a benchmark type been specified?
     if len(benchmarkType) > 0:
         # click.echo("passed test 0")
@@ -118,65 +130,29 @@ def main(compiler, benchmarkType, benchmark):
                         ### Is the inputted benchmark within the inputted benchmark type suite?
                         if set(benchmark).issubset(set(benchmark_category[benchmarkType[i]])):
                             # click.echo("passed test 4")
-                            click.echo(f"run {list(benchmark)}")
                             for j in range(len(benchmark)):
                                 benchmarkPaths.append(benchmark_category[benchmarkType[0]][benchmark[j]])
                             pytestPaths = " ".join(tuple(benchmarkPaths))
-                            # benchmarkPath = benchmark_category[benchmarkType[i]][benchmark[0]]
-                            click.echo(pytestPaths)
-                            # click.echo(benchmarkPath)
-                            # subprocess.run(
-                            #     [
-                            #         f"{windows_ad1}pytest {windows_ad2}{benchmarkPath} {mTag}{compiler[0]} --store"
-                            #     ],
-                            #     shell=True,
-                            # )
-                            resultsDict = resultRetrieval()
-                            resultNum = max(resultsDict.keys())
-                            click.echo(resultNum)
-                            # subprocess.run(
-                            #     [
-                            #         f"python -m report.console_tables --storage results/000{resultNum}_bench.json"
-                            #     ],
-                            #     shell=True,
-                                # )
-                            click.echo(
-                                f"If you want to view the results chart type:\npython -m report.console_tables --storage results/{format(resultNum).zfill(4)}_bench.json"
-                            )
+                            runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
+                            showResult()
                             i += 1
-                        else:
-                            click.echo(
-                                f"For the {benchmarkType} benchmark type you can only these benchmarks:\x1B[3m{benchmark_category[benchmarkType]}\x1B[0m"
-                            )
-                    else:
-                        click.echo(f"Please input a valid benchmark:\x1B[3m{benchmarks}\x1B[0m")
                 else:
-                    # click.echo(benchmark_category[benchmarkType[i]])
-                    for benchmark, path in benchmark_category[benchmarkType[i]].items():
-                        click.echo(f"\x1B[3m{benchmark}\x1B[0m")
-                        # for benchmark, path in benchmark_pair.items():
-                        #     click.echo(path)
-                        click.echo(f"run all \x1B[3m{benchmarkType[i]}\x1B[0m benchmarks")
-                        i += 1
-                # click.echo(f"Please input a valid benchmark:\x1B[3m{benchmarks}\x1B[0m")
-            else:
-                click.echo(f"Please input a valid benchmark:\x1B[3m{benchmarks}\x1B[0m")
+                    myDict = benchmark_category[benchmarkType[0]]
+                    for v in myDict.values():
+                        benchmarkPaths.append(v)
+                    pytestPaths = " ".join(tuple(benchmarkPaths))
+                    runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
+                    showResult()
+                    i += 1
     else:
-        # click.echo(f"Please input a valid benchmark:\x1B[3m{benchmark_types}\x1B[0m")
         question = input(f"Would you like to run all {len(benchmarks)} available benchmarks (y/n) ")
         if question.lower() == "y":
-            benchmarkPaths = []
-            mTag = ""
             for benchmark_list in benchmark_category.values():
-                # click.echo(benchmark_list)
                 for paths in benchmark_list.values():
                     benchmarkPaths.append(paths)
-                    # click.echo(benchmarkPaths)
-                    # benchmarkPaths.append(benchmark_pair)
-                    print()
             pytestPaths = " ".join(tuple(benchmarkPaths))
-            click.echo(f"{windows_ad1}pytest {windows_ad2}{pytestPaths} {mTag}{compiler} --store")
-            click.echo("run all benchmarks")
+            runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
+            showResult()
 
 
 if __name__ == "__main__":
