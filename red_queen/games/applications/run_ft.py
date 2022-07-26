@@ -14,7 +14,7 @@
 
 import os
 import pytest
-from applications import backends, run_qiskit_circuit
+from red_queen.games.applications import backends, run_qiskit_circuit
 import numpy as np
 
 # Importing standard Qiskit libraries
