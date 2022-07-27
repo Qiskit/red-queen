@@ -94,7 +94,6 @@ def bench_qiskit_ft(benchmark, optimization_level, backend, method):
         len(SECRET_STRING)
     )
     expected_counts = {binary_1: shots} if method == "1" else {SECRET_STRING: shots}
-    # print(expected_counts)
     if method == "1":
         benchmark.name = "Quantum Fourier Transform v1"
         circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_1.qasm"))
