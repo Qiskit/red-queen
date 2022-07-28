@@ -4,12 +4,8 @@ import sys
 import platform
 from contextlib import redirect_stderr
 import subprocess
-<<<<<<< HEAD
 import configparser
 import click
-=======
-
->>>>>>> 7bcbd32 (Test out the CLA)
 
 
 def benchmarkRetrieval():
@@ -17,17 +13,11 @@ def benchmarkRetrieval():
     benchmark_types = []
     benchmarks = []
     dir_path = "games"
-<<<<<<< HEAD
     windows_ad1 = ""
     windows_ad2 = ""
     if platform.system() == "Windows":
         windows_ad1 = "python -m "
         windows_ad2 = "-s "
-=======
-    user_os = ""
-    if platform.system() == "Windows":
-        user_os = "python -m "
->>>>>>> 7bcbd32 (Test out the CLA)
     for entry in os.scandir(dir_path):
         if not entry.name.startswith(".") and entry.is_dir():
             benchmark_category[entry.name] = []
@@ -42,7 +32,6 @@ def benchmarkRetrieval():
     for benchmark_pairs in benchmark_category.values():
         for keys in benchmark_pairs.keys():
             benchmarks.append(keys)
-<<<<<<< HEAD
 
     return benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2
 
@@ -58,9 +47,6 @@ def complierRetrieval():
     # This line tests to see if there is a complier specifed
     return complierList
 
-=======
-    return benchmark_category, benchmark_types, benchmarks, user_os
->>>>>>> 7bcbd32 (Test out the CLA)
 
 def resultRetrieval():
     i = 1
@@ -78,7 +64,6 @@ def runBenchmarks(pytestPaths: str, windows_ad1:str, mTag:str, compiler:str):
     click.echo("benchmarks ran")
     subprocess.run([f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"], shell=True,)
 
-<<<<<<< HEAD
 def showResult():
     resultsDict = resultRetrieval()
     resultNum = max(resultsDict.keys())
@@ -88,35 +73,6 @@ def showResult():
 
 benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2 = benchmarkRetrieval()
 complierList = complierRetrieval()
-=======
-def main():
-    benchmark_category, benchmark_types, benchmarks, user_os = benchmarkRetrieval()
-    parser = argparse.ArgumentParser(
-        prog="red-queen", description="Red-Queen is a benchmark suite for quantum compilers"
-    )
-    # parser.add_argument('--verbose', '-v')
-    parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
-    parser.add_argument(
-        "-c",
-        "--compiler",
-        choices=["qiskit", "tket", "tweedledum"],
-        help="enter a compliler here",
-    )
-    parser.add_argument(
-        "-t",
-        "--benchmarkType",
-        nargs="*",
-        choices=benchmark_types,
-        help="enter the type of benchmark(s) here",
-    )
-    parser.add_argument(
-        "-b",
-        "--benchmark",
-        nargs="*",
-        choices=benchmarks,
-        help="enter the specfic benchmark(s) here",
-    )
->>>>>>> 7bcbd32 (Test out the CLA)
 
 
 @click.command()
