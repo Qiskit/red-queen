@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import argparse
 import os
 import sys
 import platform
 from contextlib import redirect_stderr
 import subprocess
-
+import configparser
+import click
 
 
 def benchmarkRetrieval():
@@ -13,9 +13,11 @@ def benchmarkRetrieval():
     benchmark_types = []
     benchmarks = []
     dir_path = "games"
-    user_os = ""
+    windows_ad1 = ""
+    windows_ad2 = ""
     if platform.system() == "Windows":
-        user_os = "python -m "
+        windows_ad1 = "python -m "
+        windows_ad2 = "-s "
     for entry in os.scandir(dir_path):
         if not entry.name.startswith(".") and entry.is_dir():
             benchmark_category[entry.name] = []
@@ -30,102 +32,127 @@ def benchmarkRetrieval():
     for benchmark_pairs in benchmark_category.values():
         for keys in benchmark_pairs.keys():
             benchmarks.append(keys)
-    return benchmark_category, benchmark_types, benchmarks, user_os
+
+    return benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2
 
 
-def main():
-    benchmark_category, benchmark_types, benchmarks, user_os = benchmarkRetrieval()
-    parser = argparse.ArgumentParser(
-        prog="red-queen", description="Red-Queen is a benchmark suite for quantum compilers"
-    )
-    # parser.add_argument('--verbose', '-v')
-    parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
-    parser.add_argument(
-        "-c",
-        "--compiler",
-        choices=["qiskit", "tket", "tweedledum"],
-        help="enter a compliler here",
-    )
-    parser.add_argument(
-        "-t",
-        "--benchmarkType",
-        nargs="*",
-        choices=benchmark_types,
-        help="enter the type of benchmark(s) here",
-    )
-    parser.add_argument(
-        "-b",
-        "--benchmark",
-        nargs="*",
-        choices=benchmarks,
-        help="enter the specfic benchmark(s) here",
-    )
+def complierRetrieval():
+    complierList = []
+    config = configparser.ConfigParser()
+    config.read("pytest.ini")
+    for complier in config["pytest"]["markers"].split("\n"):
+        if complier != "":
+            complierList.append(complier)
+    # print(complierList)
+    # This line tests to see if there is a complier specifed
+    return complierList
 
-    args = parser.parse_args()
 
+def resultRetrieval():
+    i = 1
+    results = {}
+    dir_path = "results"
+    for entry in os.scandir(dir_path):
+        # print(entry.name,entry.path)
+        if entry.name.endswith(".json") and entry.is_file():
+            results[i] = {entry.name: entry.path}
+            i += 1
+    # print(results)
+    return results
+
+def runBenchmarks(pytestPaths: str, windows_ad1:str, mTag:str, compiler:str):
+    click.echo("benchmarks ran")
+    subprocess.run([f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"], shell=True,)
+
+def showResult():
+    resultsDict = resultRetrieval()
+    resultNum = max(resultsDict.keys())
+    subprocess.run([f"python -m report.console_tables --storage results/000{resultNum}_bench.json"],shell=True,)
+    click.echo(resultNum)
+    click.echo(f"If you want to view the results chart type:\npython -m report.console_tables --storage results/{format(resultNum).zfill(4)}_bench.json")
+
+benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2 = benchmarkRetrieval()
+complierList = complierRetrieval()
+
+
+@click.command()
+# @click.option("--version", action="version", version="%(prog)s 0.0.1")
+@click.option(
+    "-c",
+    "--compiler",
+    "compiler",
+    multiple=True,
+    type=click.Choice(complierList),
+    help="enter a compliler here",
+)
+@click.option(
+    "-t",
+    "--benchmarkType",
+    "benchmarkType",
+    multiple=True,
+    type=click.Choice(benchmark_types),
+    help="enter the type of benchmark(s) here",
+)
+@click.option(
+    "-b",
+    "--benchmark",
+    "benchmark",
+    multiple=True,
+    type=click.Choice(benchmarks),
+    help="enter the specfic benchmark(s) here",
+)
+def main(compiler, benchmarkType, benchmark):
+    benchmarkPaths = []
+    pytestPaths = ""
+    myDict = {}
+    mTag = ""
+    if len(compiler) > 0:
+        mTag = "-m "
+        compiler = compiler[0]
+    else:
+        compiler = ""
     # ### This for loop ensures that we are able to run various benchmark types
     i = 0
-    if args.benchmarkType is not None:
-        while i < len(args.benchmarkType):
-            ### Has a benchmark type been specified?
-            if args.benchmarkType is not None:
-                # print("passed test 0")
-                ### Is the inputted benchmark type valid?
-                if set(args.benchmarkType).issubset(benchmark_category):
-                    # print("passed test 1")
-                    ### Has a benchmark been specified?
-                    if args.benchmark is not None:
-                        # print("passed test 2")
-                        ### Are the inputted benchmark(s) valid?
-                        if set(args.benchmark).issubset(benchmarks):
-                            # print("passed test 3")
-                            ### Is the inputted benchmark within the inputted benchmark type suite?
-                            if set(args.benchmark).issubset(
-                                set(benchmark_category[args.benchmarkType[i]])
-                            ):
-                                # print("passed test 4")
-                                print(f"run {args.benchmark}")
-                                print(
-                                    f"If you want to view the results chart type:\npython -m report.console_tables --storage results/<latest_number>_bench.json"
-                                    )
-                                # codeRan = subprocess.run(
-                                #     [
-                                #         f"{user_os}pytest {benchmark_category[args.benchmarkType[i]][args.benchmark[i]]} -m {args.compiler} --store"
-                                #     ],
-                                #     shell=True,
-                                # )
-                                i += 1
-                            else:
-                                parser.error(
-                                    f"For the {args.benchmarkType} benchmark type you can only these benchmarks:\x1B[3m{benchmark_category[args.benchmarkType]}\x1B[0m"
-                                )
-                        else:
-                            parser.error(
-                                f"Please input a valid benchmark:\x1B[3m{benchmarks}\x1B[0m"
-                            )
-                    else:
-                        # print(benchmark_category[args.benchmarkType[i]])
-                        for benchmark, path in benchmark_category[args.benchmarkType[i]].items():
-                            print(f"\x1B[3m{benchmark}\x1B[0m")
-                            # for benchmark, path in benchmark_pair.items():
-                            #     print(path)
-                        print(f"run all \x1B[3m{args.benchmarkType[i]}\x1B[0m benchmarks")
-                        i += 1
-                        # parser.error(f"Please input a valid benchmark:\x1B[3m{benchmarks}\x1B[0m")
+    j = 0
+    ### Has a benchmark type been specified?
+    if len(benchmarkType) > 0:
+        # click.echo("passed test 0")
+        while i < len(benchmarkType):
+            ### Is the inputted benchmark type valid?
+            if set(benchmarkType).issubset(benchmark_category):
+                # click.echo("passed test 1")
+                ### Has a benchmark been specified?
+                if len(benchmark) > 0:
+                    # click.echo("passed test 2")
+                    ### Are the inputted benchmark(s) valid?
+                    if set(benchmark).issubset(benchmarks):
+                        # click.echo("passed test 3")
+                        ### Is the inputted benchmark within the inputted benchmark type suite?
+                        if set(benchmark).issubset(set(benchmark_category[benchmarkType[i]])):
+                            # click.echo("passed test 4")
+                            for j in range(len(benchmark)):
+                                benchmarkPaths.append(benchmark_category[benchmarkType[0]][benchmark[j]])
+                            pytestPaths = " ".join(tuple(benchmarkPaths))
+                            runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
+                            showResult()
+                            i += 1
                 else:
-                    parser.error(f"Please input a valid benchmark:\x1B[3m{benchmarks}\x1B[0m")
-            else:
-                q1 = input(
-                    f"Would you like to run all {len(benchmarks)} available benchmarks (y/n) "
-                )
-                if q1.lower() == "y":
-                    for benchmark_list in benchmark_category.values():
-                        for benchmark_pair in benchmark_list:
-                            for benchmark, path in benchmark_pair.items():
-                                print(path)
-                    print("run all benchmarks")
+                    myDict = benchmark_category[benchmarkType[0]]
+                    for v in myDict.values():
+                        benchmarkPaths.append(v)
+                    pytestPaths = " ".join(tuple(benchmarkPaths))
+                    runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
+                    showResult()
+                    i += 1
     else:
-        parser.error(f"Please input a valid benchmark:\x1B[3m{benchmark_types}\x1B[0m")
+        question = input(f"Would you like to run all {len(benchmarks)} available benchmarks (y/n) ")
+        if question.lower() == "y":
+            for benchmark_list in benchmark_category.values():
+                for paths in benchmark_list.values():
+                    benchmarkPaths.append(paths)
+            pytestPaths = " ".join(tuple(benchmarkPaths))
+            runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
+            showResult()
 
 
 if __name__ == "__main__":
