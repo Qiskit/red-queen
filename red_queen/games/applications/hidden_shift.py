@@ -3,7 +3,7 @@
 # See accompanying file /LICENSE for details.
 # ---------------------------------------------------------------------------------------------
 
-# Based on the code from Team Hidden Name, Qiskit Hackathon Korea 2022
+# Based on the code by Team Hidden Name, Qiskit Hackathon Korea 2022
 
 # github repository:
 # https://github.com/Team-Hidden-Name/hidden-shift-problem/blob/main/hidden-shift-problem.ipynb
