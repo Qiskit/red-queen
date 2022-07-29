@@ -210,21 +210,6 @@ def add_mcx(q_c, controls, target):
     q_c.h(target)
 
 
-# def grovers_search(num_qubits, marked_item, n_iterations)
-def grovers_dist(num_qubits, marked_item, n_iterations):
-    """This function displays the qubit that gets amplified"""
-    dist = {}
-    for i in range(2**num_qubits):
-        key = bin(i)[2:].zfill(num_qubits)
-        theta = np.arcsin(1 / np.sqrt(2**num_qubits))
-        if i == marked_item:
-            dist[key] = np.sin((2 * n_iterations + 1) * theta) ** 2
-        else:
-            dist[key] = (
-                np.cos((2 * n_iterations + 1) * theta) / (np.sqrt(2**num_qubits - 1))
-            ) ** 2
-    return dist
-
 
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
