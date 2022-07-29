@@ -1,6 +1,6 @@
 OPENQASM 2.0;
 include "qelib1.inc";
-gate gate_Shift q0,q1,q2,q3,q4,q5 { x q5; }
+gate gate_Shift q0,q1,q2,q3,q4,q5 { x q1; x q2; x q4; }
 gate gate_Oracle_g q0,q1,q2,q3,q4,q5 { gate_Shift q0,q1,q2,q3,q4,q5; cz q0,q3; cz q1,q4; cz q2,q5; z q2; gate_Shift q0,q1,q2,q3,q4,q5; }
 gate gate_Oracle_f q0,q1,q2,q3,q4,q5 { cz q0,q3; cz q1,q4; cz q2,q5; z q5; }
 qreg q[6];
