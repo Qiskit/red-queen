@@ -8,7 +8,7 @@
 import pytest
 
 from qiskit.compiler import transpile
-from qiskit.result import marginal_counts
+from qiskit.result import marginal_distribution
 from qiskit.providers.fake_provider import (
     FakeWashington,
     FakeBrooklyn,
@@ -56,7 +56,7 @@ def run_qiskit_circuit(
         counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
     else:
         pre_marg_counts = [
-            marginal_counts(
+            marginal_distribution(
                 backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts(),
                 [qubit],
             )
