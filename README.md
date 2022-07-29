@@ -35,10 +35,18 @@ pip install -r requirements.txt
 Now, suppose you want to run the mapping benchmarks using only `tweedledum`.
 You must do it using `pytest`
 ```bash
-pytest games/mapping/map_queko.py -m tweedledum --store
+pytest red_queen/games/mapping/map_queko.py -m tweedledum --store
 ```
+
+To run pytest on Windows, you will have to use `python -m` in order to run the 
+`pytest` command. You will also need to add `-s` to your pytest call to disable 
+stdin handling.
+```bash
+python -m pytest -s red_queen/games/mapping/map_queko.py -m tweedledum --store
+```
+
 The benchmark suite will consider all functions named `bench_*` in 
-`games/mapping/map_queko.py`. Because we set the `-m` option, only the the ones
+`red_queen/games/mapping/map_queko.py`. Because we set the `-m` option, only the the ones
 marked with `tweedledum` will be run. (We could easy do the same for `qiskit`).
 If you don't define a `-m` option, all `bench_*` functions will be run.
 
