@@ -59,5 +59,9 @@ setup(
         "Documentation": "https://qiskit.org/documentation/",
         "Source Code": "https://github.com/Qiskit/red-queen",
     },
+    entry_points="""
+        [console_scripts]
+        red-queen=cli:main
+    """,
     zip_safe=False,
 )

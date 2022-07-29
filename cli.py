@@ -5,9 +5,7 @@
 
 #!/usr/bin/env python3
 import os
-import sys
 import platform
-from contextlib import redirect_stderr
 import subprocess
 import configparser
 import click

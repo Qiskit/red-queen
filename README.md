@@ -52,19 +52,11 @@ The general templete for the `CLI` is as follows:
 
 <br>
 
-[For MacOs and Linux]
 
 ```bash
-python red-queen.py -c <complier> -t <benchmark_type> -b <benchmark_name>
+red-queen -c <complier> -t <benchmark_type> -b <benchmark_name>
 ```
 
-[For Windows]
-
-```bash
-python -m red-queen.py -c <complier> -t <benchmark_type> -b <benchmark_name>
-```
-
-<br>
 
 Now, suppose you want to run the mapping benchmarks using only `tweedledum`.
 You can do this via the `CLI` or with `pytest`
@@ -77,7 +69,7 @@ You can do this via the `CLI` or with `pytest`
 With `CLI`
 
 ```bash
-python red-queen.py -c tweedledum -t mapping -b map_queko.py
+red-queen -c tweedledum -t mapping -b map_queko.py
 ```
 
 With `pytest`
@@ -93,7 +85,7 @@ python -m pytest games/mapping/map_queko.py -m tweedledum --store
 With `CLI`
 
 ```bash
-python -m red-queen.py -c tweedledum -t mapping -b map_queko.py
+red-queen -c tweedledum -t mapping -b map_queko.py
 ```
 
 With `pytest`
