@@ -30,7 +30,7 @@ import pytest
 
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from . import backends, run_qiskit_circuit
+from red_queen.games.applications import backends, run_qiskit_circuit
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 
