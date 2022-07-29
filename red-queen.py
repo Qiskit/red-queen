@@ -12,23 +12,22 @@ def benchmarkRetrieval():
     benchmark_category = {}
     benchmark_types = []
     benchmarks = []
-    dir_path = "games"
+    dir_path = "red_queen/games/"
     windows_ad1 = ""
     windows_ad2 = ""
     if platform.system() == "Windows":
-        windows_ad1 = "python -m "
+        windows_ad1 = "python3 -m "
         windows_ad2 = "-s "
     for entry in os.scandir(dir_path):
-        if not entry.name.startswith(".") and entry.is_dir():
+        if entry.is_dir():
             benchmark_category[entry.name] = []
             subDict = {}
-            for sub in os.scandir(f"games/{entry.name}"):
+            for sub in os.scandir(f"{dir_path}{entry.name}"):
                 if not sub.name.startswith("_") and sub.name.endswith(".py") and sub.is_file():
                     subDict[sub.name] = sub.path
             benchmark_category[entry.name] = subDict
 
     benchmark_types = list(benchmark_category.keys())
-
     for benchmark_pairs in benchmark_category.values():
         for keys in benchmark_pairs.keys():
             benchmarks.append(keys)
@@ -49,27 +48,28 @@ def complierRetrieval():
 
 
 def resultRetrieval():
-    i = 1
     results = {}
     dir_path = "results"
     for entry in os.scandir(dir_path):
-        # print(entry.name,entry.path)
-        if entry.name.endswith(".json") and entry.is_file():
-            results[i] = {entry.name: entry.path}
-            i += 1
-    # print(results)
+        if entry.is_file():
+            filename = entry.name
+            resultCount = int(filename.split("_")[0])
+            results[resultCount] = {entry.name: entry.path}
     return results
 
 def runBenchmarks(pytestPaths: str, windows_ad1:str, mTag:str, compiler:str):
     click.echo("benchmarks ran")
-    subprocess.run([f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"], shell=True,)
+    subprocess.run([f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"], shell=True)
 
 def showResult():
     resultsDict = resultRetrieval()
+    click.echo(resultsDict)
     resultNum = max(resultsDict.keys())
-    subprocess.run([f"python -m report.console_tables --storage results/000{resultNum}_bench.json"],shell=True,)
     click.echo(resultNum)
-    click.echo(f"If you want to view the results chart type:\npython -m report.console_tables --storage results/{format(resultNum).zfill(4)}_bench.json")
+    result_path = tuple(resultsDict[resultNum].values())[0]
+    command = f"python3 -m report.console_tables --storage {result_path}"
+    subprocess.run([command],shell=True)
+    click.echo(f"If you want to view the results chart type:\npython -m report.console_tables --storage {result_path}")
 
 benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2 = benchmarkRetrieval()
 complierList = complierRetrieval()
