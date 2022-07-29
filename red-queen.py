@@ -57,9 +57,14 @@ def resultRetrieval():
             results[resultCount] = {entry.name: entry.path}
     return results
 
-def runBenchmarks(pytestPaths: str, windows_ad1:str, mTag:str, compiler:str):
+
+def runBenchmarks(pytestPaths: str, windows_ad1: str, mTag: str, compiler: str):
     click.echo("benchmarks ran")
-    subprocess.run([f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"], shell=True)
+    subprocess.run(
+        [f"{windows_ad1}pytest -n auto {windows_ad2}{pytestPaths} {mTag}{compiler} --store"],
+        shell=True,
+    )
+
 
 def showResult():
     resultsDict = resultRetrieval()
@@ -68,8 +73,11 @@ def showResult():
     click.echo(resultNum)
     result_path = tuple(resultsDict[resultNum].values())[0]
     command = f"python3 -m report.console_tables --storage {result_path}"
-    subprocess.run([command],shell=True)
-    click.echo(f"If you want to view the results chart type:\npython -m report.console_tables --storage {result_path}")
+    subprocess.run([command], shell=True)
+    click.echo(
+        f"If you want to view the results chart type:\npython -m report.console_tables --storage {result_path}"
+    )
+
 
 benchmark_category, benchmark_types, benchmarks, windows_ad1, windows_ad2 = benchmarkRetrieval()
 complierList = complierRetrieval()
@@ -131,7 +139,9 @@ def main(compiler, benchmarkType, benchmark):
                         if set(benchmark).issubset(set(benchmark_category[benchmarkType[i]])):
                             # click.echo("passed test 4")
                             for j in range(len(benchmark)):
-                                benchmarkPaths.append(benchmark_category[benchmarkType[0]][benchmark[j]])
+                                benchmarkPaths.append(
+                                    benchmark_category[benchmarkType[0]][benchmark[j]]
+                                )
                             pytestPaths = " ".join(tuple(benchmarkPaths))
                             runBenchmarks(pytestPaths, windows_ad1, mTag, compiler)
                             showResult()
