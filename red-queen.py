@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Part of Red Queen Project.  This file is distributed under the MIT License.
+# See accompanying file /LICENSE for details.
+# ------------------------------------------------------------------------------
+
 #!/usr/bin/env python3
 import os
 import sys
