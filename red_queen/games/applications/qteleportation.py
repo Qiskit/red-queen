@@ -10,12 +10,13 @@ import pytest
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit import IBMQ, Aer, transpile
-from applications import backends, run_qiskit_circuit
+from red_queen.games.applications import backends, run_qiskit_circuit
+#from __init__ import backends, run_qiskit_circuit
 from qiskit.extensions import Initialize
 
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
-state = [1/np.sqrt(2), -1j/np.sqrt(2)]
+state = [1/np.sqrt(2), -1/np.sqrt(2)]
 
 def bell_pair(qc, x, y):
     qc.h(x)
@@ -34,23 +35,17 @@ def b_gates(qc, qubit, crz, crx):
     qc.x(qubit).c_if(crx, 1)
     qc.z(qubit).c_if(crz, 1)
 
-def initgate(state):
+def initgate(qc, qubit):
     
-    init_gate = Initialize(state)
-    init_gate.label = "init"
-    reverse = init_gate.gates_to_uncompute()
-    reverse.label = "reverse"
-    return init_gate, reverse
+    qc.r(np.pi/2,np.pi, qubit)
     
     
-def build_qteleportation(state):
+def build_qteleportation():
     qr = QuantumRegister(3, name="q")
-    crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-    teleportation_circuit = QuantumCircuit(qr, crz, crx)
+    z, x = ClassicalRegister(1, name="classz"), ClassicalRegister(1, name="classx")
+    teleportation_circuit = QuantumCircuit(qr, z, x)
     
-    inits = initgate(state)
-    
-    teleportation_circuit.append(inits[0], [0])
+    initgate(teleportation_circuit, 0)
     teleportation_circuit.barrier()
     
     bell_pair(teleportation_circuit, 1, 2)
@@ -61,9 +56,9 @@ def build_qteleportation(state):
     measure_and_send(teleportation_circuit, 0, 1)
     
     teleportation_circuit.barrier() # Use barrier to separate steps
-    b_gates(teleportation_circuit, 2, crz, crx)
+    b_gates(teleportation_circuit, 2, z, x)
     
-    teleportation_circuit.append(inits[1], [2])
+    initgate(teleportation_circuit, 2)
     
     cr_result = ClassicalRegister(1)
     teleportation_circuit.add_register(cr_result)
@@ -71,3 +66,18 @@ def build_qteleportation(state):
     
     return teleportation_circuit
 
+@pytest.mark.qiskit
+@pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
+@pytest.mark.parametrize("backend", backends)
+def bench_quantum_teleportation(benchmark, optimization_level, backend):
+    shots = 65536
+    expected_counts = {'1': shots}
+    benchmark.name = "Quantum Teleportation"
+    circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "quantum_teleportation.qasm"))
+    benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
+    run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts, marginalize=1)
+
+
+if __name__ == "__main__":
+    build_qteleportation().qasm(filename=os.path.join(QASM_DIR, "quantum_teleportation.qasm"))
+   
