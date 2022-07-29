@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------------------------
-# Part of Red Queen Project.  This file is distributed under the MIT License.
+# Part of Red Queen Project.  This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ---------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
 import os
 import pytest
 from qiskit import QuantumCircuit
-from applications import backends, run_qiskit_circuit
+from red_queen.games.applications import backends, run_qiskit_circuit
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 
