@@ -7,9 +7,9 @@
 
 # github repository:
 # https://github.com/Team-Hidden-Name/hidden-shift-problem/blob/main/hidden-shift-problem.ipynb
-    # Variable names from functions were modified to comply with pylint recommendations
-    # and Fourier-Transform-Free Algorithm code was ommited.
-    # Code was made applicable to take in other NUM_QUBITS and SECRET_STRING inputs.
+# Variable names from functions were modified to comply with pylint recommendations
+# and Fourier-Transform-Free Algorithm code was ommited.
+# Code was made applicable to take in other NUM_QUBITS and SECRET_STRING inputs.
 
 
 """Hidden Shift Benchmark Circuit"""
@@ -28,6 +28,7 @@ SECRET_STRING = "010110"  # the binary hidden shift string
 
 # ---------------------------------------------------------------------------------------------
 
+
 def the_shift(num_qubits, secret_string):
     """the shifting operation for the given secret_string"""
     shift = QuantumCircuit(num_qubits)
@@ -40,7 +41,9 @@ def the_shift(num_qubits, secret_string):
     shift.name = "Shift"
     return shift
 
+
 # ---------------------------------------------------------------------------------------------
+
 
 def g_oracle(num_qubits, secret_string):
     """defining the g oracle"""
@@ -62,7 +65,9 @@ def g_oracle(num_qubits, secret_string):
     oracle_g.name = "Oracle g"
     return oracle_g
 
+
 # ---------------------------------------------------------------------------------------------
+
 
 def f_oracle(num_qubits):
     """oracle circuit that encodes Fourier Transform"""
@@ -77,7 +82,9 @@ def f_oracle(num_qubits):
     oracle_f.name = "Oracle f"
     return oracle_f
 
+
 # ---------------------------------------------------------------------------------------------
+
 
 def hs_circuit(num_qubits, secret_string):
     """setting up hidden shift circuit"""
@@ -107,7 +114,9 @@ def hs_circuit(num_qubits, secret_string):
 
     return hs
 
+
 # ---------------------------------------------------------------------------------------------
+
 
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
@@ -123,6 +132,7 @@ def bench_qiskit_hs(benchmark, optimization_level, backend, method):
 
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
+
 
 if __name__ == "__main__":
     hs_circuit(NUM_QUBITS, SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "hs.qasm"))
