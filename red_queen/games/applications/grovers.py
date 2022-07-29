@@ -210,7 +210,6 @@ def add_mcx(q_c, controls, target):
     q_c.h(target)
 
 
-
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
