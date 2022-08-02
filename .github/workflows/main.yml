@@ -30,13 +30,13 @@ jobs:
         run: python -m pip install -U tox
       - name: Run lint
         run: tox -elint
-  build:
+  benchmark:
     runs-on: ubuntu-latest  # windows-latest | macos-latest
-    name: Test changed-files
+    name: Test changed benchmarks
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+          fetch-depth: 2  # OR "2" -> To retrieve the preceding commit.
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
@@ -54,12 +54,8 @@ jobs:
       - name: Install Deps
         run: |
           python -m pip install --upgrade pip
-          pip install pytest-sugar
           pip install .
       - name: Run every new benchmark
         run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
-            pytest ${file} -n 2 --verbose --tb=no --store
-            python -m report.console_tables --storage results/0001_bench.json
-            rm results/0001_bench.json
-          done
+          pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+          python -m report.console_tables --storage results/0001_bench.json
