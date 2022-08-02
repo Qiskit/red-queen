@@ -148,5 +148,11 @@ on the knowledge of the internals of the following established `pytest` plugins:
 
 ## License
 
-This software is licensed under the Apache 2.0 licence (see
+
+This software is licensed under the Apache 2.0 licence (see 
 [LICENSE](https://github.com/Qiskit/red-queen/blob/main/LICENSE))
+
+## Contributing
+
+If you're interested in contributing to Red Queen please see the
+[contributing guide](CONTRIBUTING.md).
