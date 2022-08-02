@@ -56,6 +56,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
       - name: Run every new benchmark
-        run: |
-          pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
-          python -m report.console_tables --storage results/0001_bench.json
+        run: pytest ${{steps.changed-files.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+      - name: Print results to text-file
+        run: python -m report.console_tables --storage results/0001_bench.json > results/0001_table.txt
+      - name: Upload table and original result file
+        uses: actions/upload-artifact@v3
+        with:
+          name: results
+          path: results/
+          if-no-files-found: error
