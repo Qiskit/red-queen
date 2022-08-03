@@ -3,12 +3,12 @@
 # See accompanying file /LICENSE for details.
 # ---------------------------------------------------------------------------------------------
 
-# Based on the code by Team Hidden Name, Qiskit Hackathon Korea 2022
+# This benchamrk was implemented based on the following qiskit textbook notebook:
 
 # github repository:
-# https://github.com/Team-Hidden-Name/hidden-shift-problem/blob/main/hidden-shift-problem.ipynb
+# https://github.com/qiskit-community/qiskit-textbook/blob/main/content/ch-algorithms/hidden-shift-problem.ipynb
 # Variable names from functions were modified to comply with pylint recommendations
-# and Fourier-Transform-Free Algorithm code was ommited.
+# Fourier-Transform-Free Algorithm code was ommited.
 # Code was made applicable to take in other NUM_QUBITS and SECRET_STRING inputs.
 
 
