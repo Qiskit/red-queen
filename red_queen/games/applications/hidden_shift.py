@@ -61,9 +61,6 @@ def g_oracle(num_qubits, secret_string):
     return oracle_g
 
 
-# ---------------------------------------------------------------------------------------------
-
-
 def f_oracle(num_qubits):
     """oracle circuit that encodes Fourier Transform"""
     oracle_f = QuantumCircuit(num_qubits)
