@@ -7,5 +7,4 @@ qiskit-aer
 pytket>1.0,<2.0
 setproctitle
 rich
-configparser
 click
