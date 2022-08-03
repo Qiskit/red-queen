@@ -83,9 +83,6 @@ def f_oracle(num_qubits):
     return oracle_f
 
 
-# ---------------------------------------------------------------------------------------------
-
-
 def hs_circuit(num_qubits, secret_string):
     """setting up hidden shift circuit"""
     hs = QuantumCircuit(num_qubits, num_qubits)
