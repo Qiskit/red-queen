@@ -115,9 +115,6 @@ def hs_circuit(num_qubits, secret_string):
     return hs
 
 
-# ---------------------------------------------------------------------------------------------
-
-
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
