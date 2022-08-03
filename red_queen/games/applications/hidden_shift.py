@@ -26,8 +26,6 @@ QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 NUM_QUBITS = 6  # number of input qubits
 SECRET_STRING = "010110"  # the binary hidden shift string
 
-# ---------------------------------------------------------------------------------------------
-
 
 def the_shift(num_qubits, secret_string):
     """the shifting operation for the given secret_string"""
