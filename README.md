@@ -58,8 +58,24 @@ python -m report.console_tables --storage results/0001_bench.json
 ```
 To see `games/applications` results as a bar graph, run:
 ```bash
-python view.py <JSON FILE> <DATA TYPE>
+python visualization/view.py view <JSON FILE> <DATA TYPE>
 ```
+For example:
+```bash
+python visualization/view.py view results/0001_bench.json fidelity
+```
+This will compare each method of the benchmark using the datatype as a metric.
+
+To compare two results files with a bar graph, run:
+```bash
+python visualization/view.py compare <JSON FILE> <JSON FILE> <DATA TYPE>
+```
+For example:
+```bash
+python visualization/view.py compare results/0001_bench.json results/0002_bench.json fidelity
+```
+This will average out the datatype metric for each file, and compare the two.
+
 Currently supported datatypes are `fidelity`, which gives average fidelity for each benchmark, and `meantime`, which gives the average time for each benchmark. 
 
 ## Warning

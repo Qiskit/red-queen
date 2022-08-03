@@ -141,6 +141,4 @@ if __name__ == "__main__":
 
     
 
-#python view.py <JSON FILE> <DATA TYPE>
-#python view.py view <JSON FILE> <DATA TYPE>
-#python view.py compare <JSON FILE #1> <JSON FILE #2> <DATA TYPE>
+
