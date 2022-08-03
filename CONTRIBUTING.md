@@ -25,3 +25,23 @@ If black returns a code formatting error you can run `tox -eblack` to
 automatically update the code formatting to conform to the style. However,
 if `pylint` returns any error you will have to fix these issues by manually
 updating your code.
+
+## Continuous Integration
+
+The red-queen repo has a Continuous Integration (CI) action that test any new 
+or modified benchmarks being added in a pull request. This action was implemented 
+using [changed-files](https://github.com/tj-actions/changed-files).
+
+In the case that a new type of benchmark category is implemented, the directory 
+of the python file that will be run with pytest should be added to `.github/workflows/main.yml`.
+
+In the `Get changed benchmarks` action, under the `files` list, add the 
+directory with the following format:
+
+`red_queen/<directory>/*.py`
+
+The `*.py` suffix makes sure that only the python files will be considered. 
+Also, make sure to add an exception for your `__init__.py` file by adding an 
+entry to the `files_ignore` list in the following format:
+
+`red_queen/<directory>/__init__.py`
