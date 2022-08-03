@@ -40,9 +40,6 @@ def the_shift(num_qubits, secret_string):
     return shift
 
 
-# ---------------------------------------------------------------------------------------------
-
-
 def g_oracle(num_qubits, secret_string):
     """defining the g oracle"""
     oracle_g = QuantumCircuit(num_qubits)
