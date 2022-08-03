@@ -63,6 +63,6 @@ setup(
         'console_scripts': [
             "red-queen = red_queen.cli:main",
         ]
-    }
+    },
     zip_safe=False,
 )
