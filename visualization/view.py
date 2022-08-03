@@ -4,6 +4,7 @@ from turtle import color
 import matplotlib.pyplot as plt
 from numpy import mean
 
+
 def fidelity(contents, contents2 = None):
     if not contents2:
         try:
@@ -105,15 +106,19 @@ def main(args):
             contents = json.load(f)
         if datatype == "fidelity":
             x_axis, y_axis = fidelity(contents)
+            ax = plt.subplot()
             plt.bar(x_axis, y_axis, color="darkolivegreen")
             plt.xlabel("Benchmark Name")
             plt.ylabel("Fidelity")
+            plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
             plt.show()
         elif datatype == "meantime":
             x_axis, y_axis = meantime(contents)
+            ax = plt.subplot()
             plt.bar(x_axis, y_axis, color="darkolivegreen")
             plt.xlabel("Benchmark Name")
             plt.ylabel("Mean Time")
+            plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
             plt.show()
         else:
             print("Invalid Data Type! Allowed parameters are: 'fidelity' and 'meantime'")
@@ -124,15 +129,19 @@ def main(args):
             contents2 = json.load(f)
         if datatype == "fidelity":
             x_axis, y_axis = fidelity(contents1, contents2)
+            ax = plt.subplot()
             plt.bar(x_axis, y_axis, color="darkolivegreen")
             plt.xlabel("Benchmark Name")
             plt.ylabel("Fidelity")
+            plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
             plt.show()
         elif datatype == "meantime":
             x_axis, y_axis = meantime(contents1, contents2)
+            ax = plt.subplot()
             plt.bar(x_axis, y_axis, color="darkolivegreen")
             plt.xlabel("Benchmark Name")
             plt.ylabel("Mean Time")
+            plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
             plt.show()
         else:
             print("Invalid Data Type! Allowed parameters are: 'fidelity' and 'meantime'")
