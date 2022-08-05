@@ -61,13 +61,11 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
     if platform.system() == "Windows":
         subprocess.run(
             [f"python -m pytest -s {pytest_paths} {m_tag}{compiler} --store"],
-            shell=True,
             check=True,
         )
     else:
         subprocess.run(
             [f"pytest {pytest_paths} {m_tag}{compiler} --store"],
-            shell=True,
             check=True,
         )
 
@@ -79,7 +77,7 @@ def show_result():
     click.echo(result_num)
     result_path = tuple(results_dict[result_num].values())[0]
     command = f"python3 -m report.console_tables --storage {result_path}"
-    subprocess.run([command], shell=True, check=True)
+    subprocess.run([command], check=True)
     click.echo(
         f"To view the results chart type:\npython -m report.console_tables --storage {result_path}"
     )
