@@ -12,9 +12,14 @@ import click
 
 
 def benchmark_retrieval():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     benchmark_dict = {}
     type_list = []
-    benchmarks = []
+    list_of_benchmarks = []
     dir_path = "red_queen/games/"
     for entry in os.scandir(dir_path):
         if entry.is_dir():
@@ -28,9 +33,9 @@ def benchmark_retrieval():
     type_list = list(benchmark_dict.keys())
     for benchmark_pairs in benchmark_dict.values():
         for keys in benchmark_pairs.keys():
-            benchmarks.append(keys)
+            list_of_benchmarks.append(keys)
 
-    return benchmark_dict, type_list, benchmarks
+    return benchmark_dict, type_list, list_of_benchmarks
 
 
 def complier_retrieval():
@@ -58,6 +63,7 @@ def result_retrieval():
 
 def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
     click.echo("benchmarks ran")
+    click.echo(pytest_paths)
     if platform.system() == "Windows":
         subprocess.run(
             f"python -m pytest -s {pytest_paths} {m_tag}{compiler} --store".split(),
@@ -146,9 +152,9 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
                                 benchmark_paths.append(
                                     benchmark_category[benchmarkType[0]][benchmark[j]]
                                 )
-                            pytest_paths = " ".join(tuple(benchmark_paths))
+                            pytest_paths = benchmark_paths
                             run_benchmarks(pytest_paths, m_tag, compiler)
-                            show_result()
+                            # show_result()
                             i += 1
                 else:
                     mydict = benchmark_category[benchmarkType[0]]
