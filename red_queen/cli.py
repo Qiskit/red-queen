@@ -60,7 +60,7 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
     click.echo("benchmarks ran")
     if platform.system() == "Windows":
         subprocess.run(
-            [f"python -m pytest -s {pytest_paths} {m_tag}{compiler} --store"],
+            f"python -m pytest -s {pytest_paths} {m_tag}{compiler} --store".split(),
             check=True,
         )
     else:
