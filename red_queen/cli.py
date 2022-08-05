@@ -142,7 +142,7 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
                         ### Is the inputted benchmark within the inputted benchmark type suite?
                         if set(benchmark).issubset(set(benchmark_category[benchmarkType[i]])):
                             # click.echo("passed test 4")
-                            for j in range(len(benchmark)):
+                            for j, _ in enumerate(benchmark):
                                 benchmark_paths.append(
                                     benchmark_category[benchmarkType[0]][benchmark[j]]
                                 )
