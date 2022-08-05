@@ -11,38 +11,38 @@ import configparser
 import click
 
 
-def benchmarkRetrieval():
-    benchmark_category = {}
-    benchmark_types = []
+def benchmark_retrieval():
+    benchmark_dict = {}
+    type_list = []
     benchmarks = []
     dir_path = "red_queen/games/"
     for entry in os.scandir(dir_path):
         if entry.is_dir():
-            benchmark_category[entry.name] = []
+            benchmark_dict[entry.name] = []
             sub_dict = {}
             for sub in os.scandir(f"{dir_path}{entry.name}"):
                 if not sub.name.startswith("_") and sub.name.endswith(".py") and sub.is_file():
                     sub_dict[sub.name] = sub.path
-            benchmark_category[entry.name] = sub_dict
+            benchmark_dict[entry.name] = sub_dict
 
-    benchmark_types = list(benchmark_category.keys())
-    for benchmark_pairs in benchmark_category.values():
+    type_list = list(benchmark_dict.keys())
+    for benchmark_pairs in benchmark_dict.values():
         for keys in benchmark_pairs.keys():
             benchmarks.append(keys)
 
-    return benchmark_category, benchmark_types, benchmarks
+    return benchmark_dict, type_list, benchmarks
 
 
 def complier_retrieval():
-    complier_list = []
+    list_of_compliers = []
     config = configparser.ConfigParser()
     config.read("pytest.ini")
     for complier in config["pytest"]["markers"].split("\n"):
         if complier != "":
-            complier_list.append(complier)
+            list_of_compliers.append(complier)
     # print(complier_list)
     # This line tests to see if there is a complier specifed
-    return complier_list
+    return list_of_compliers
 
 
 def result_retrieval():
@@ -83,7 +83,7 @@ def show_result():
     )
 
 
-benchmark_category, benchmark_types, benchmarks = benchmarkRetrieval()
+benchmark_category, benchmark_types, benchmarks = benchmark_retrieval()
 complier_list = complier_retrieval()
 
 
@@ -113,7 +113,7 @@ complier_list = complier_retrieval()
     type=click.Choice(benchmarks),
     help="enter the specfic benchmark(s) here",
 )
-def main(compiler, benchmarkType, benchmark):
+def main(compiler=None, benchmarkType=None, benchmark=None):
     benchmark_paths = []
     pytest_paths = ""
     mydict = {}
