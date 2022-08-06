@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------------------
-# Part of Red Queen Project.  This file is distributed under the MIT License.
+# Part of Red Queen Project.  This file is distributed under the Apache 2.0.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-
+"""Shebang is used to make this code an python executable"""
 #!/usr/bin/env python3
 import os
 import platform
@@ -12,11 +12,6 @@ import click
 
 
 def benchmark_retrieval():
-    """_summary_
-
-    Returns:
-        _type_: _description_
-    """
     benchmark_dict = {}
     type_list = []
     list_of_benchmarks = []
@@ -62,16 +57,34 @@ def result_retrieval():
 
 
 def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
+    command_list = ["pytest"]
+    compiler_command = [m_tag, compiler, "--store"]
+    # command_list.append(pytest_paths)
     click.echo("benchmarks ran")
-    click.echo(pytest_paths)
+    # click.echo(pytest_paths)
+    click.echo(f"sys.executable pytest -s {pytest_paths} {m_tag} {compiler} --store".split())
     if platform.system() == "Windows":
+        command_list.insert(0, "-m")
+        command_list.insert(0, "python")
+        command_list.append("-s")
+        for _, string in enumerate(pytest_paths):
+            command_list.append(string)
+        for _, string in enumerate(compiler_command):
+            command_list.append(string)
+        # click.echo(command_list)
         subprocess.run(
-            f"python -m pytest -s {pytest_paths} {m_tag}{compiler} --store".split(),
+            command_list,
             check=True,
         )
     else:
+        for _, string in enumerate(pytest_paths):
+            command_list.append(string)
+        for _, string in enumerate(compiler_command):
+            command_list.append(string)
+        # proper_command = " ".join(command_list)
+        # click.echo(proper_command)
         subprocess.run(
-            [f"pytest {pytest_paths} {m_tag}{compiler} --store"],
+            command_list,
             check=True,
         )
 
@@ -125,7 +138,7 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
     mydict = {}
     m_tag = ""
     if len(compiler) > 0:
-        m_tag = "-m "
+        m_tag = "-m"
         compiler = compiler[0]
     else:
         compiler = ""
