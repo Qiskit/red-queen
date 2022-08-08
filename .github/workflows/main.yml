@@ -58,12 +58,12 @@ jobs:
                 no_init=${${{steps.changes-applications.outputs.all_changed_and_modified_files}}//"red_queen/games/applications/__init__.py"/}
                 echo "$no_init"
                 if [[ "$no_init" == "" ]]; then
-                    pytest red_queen/games/applications/run_bv.py -n 2 --verbose --store
+                    pytest red_queen/games/applications/run_bv.py -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
                 else
-                    pytest "$no_init" -n 2 --verbose --store
+                    pytest "$no_init" -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
                 fi
             else
-              pytest ${{steps.changes-applications.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+              pytest ${{steps.changes-applications.outputs.all_changed_and_modified_files}} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
             fi
           fi 
       - name: Get changes in mapping
@@ -79,12 +79,12 @@ jobs:
                 no_init=${${{steps.changes-mapping.outputs.all_changed_and_modified_files}}//"red_queen/games/mapping/__init__.py"/}
                 echo "$no_init"
                 if [[ "$no_init" == "" ]]; then
-                    pytest red_queen/games/mapping/map_misc.py -n 2 --verbose --store
+                    pytest red_queen/games/mapping/map_misc.py -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
                 else
-                    pytest "$no_init" -n 2 --verbose --store
+                    pytest "$no_init" -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
                 fi
             else
-              pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 --verbose --store
+              pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
             fi
           fi 
       - name: Print results to log
@@ -94,4 +94,3 @@ jobs:
         with:
           name: results
           path: results/
-          if-no-files-found: error
