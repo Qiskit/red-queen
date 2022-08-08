@@ -43,7 +43,7 @@ from red_queen.games.applications import backends, run_qiskit_circuit
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 NUM_QUBITS = 8
 
-# Pre-calculated data from git repository
+# Pre-calculated data from QC-App-Oriented-Benchmarks git repository
 H_X = [
     -0.3841300947500583,
     0.03878295861060144,
@@ -93,67 +93,27 @@ W = 10
 T = 0.01
 
 
-# xx gate
-def xx_gate(angle):
-    qc = QuantumCircuit(2, name="xx")
-    for i in range(2):
-        qc.h(i)
-    qc.cx(0, 1)
-    qc.rz(np.pi * angle, 1)
-    qc.cx(0, 1)
-    for i in range(2):
-        qc.h(i)
+def hamiltonian_sim(n: int, K: int, t, w: int, h_x, h_z):
+    """Hamiltonian simulation circuit generator, where:
 
-    return qc
+    Args:
+        n:  The number of qubits
+        k_order: trotterization order (number of trotter steps)
+        time: time the simulation runs.
+        w: strength of disorder
+        h_x: disordered fields.
+        h_z: disordered fields."""
 
-
-# yy gate
-def yy_gate(angle):
-    qc = QuantumCircuit(2, name="yy")
-    for i in range(2):
-        qc.s(i)
-    for i in range(2):
-        qc.h(i)
-    qc.cx(0, 1)
-    qc.rz(np.pi * angle, 1)
-    qc.cx(0, 1)
-    for i in range(2):
-        qc.h(i)
-    for i in range(2):
-        qc.sdg(i)
-
-    return qc
-
-
-# zz_gate
-def zz_gate(angle):
-    qc = QuantumCircuit(2, name="zz")
-    qc.cx(0, 1)
-    qc.rz(np.pi * angle, 1)
-    qc.cx(0, 1)
-
-    return qc
-
-
-# Hamiltonian simulation circuit generator, where:
-#    n = number of qubits
-#    k_order = trotterization order (number of trotter steps)
-#    time = time the simulation runs.
-#    w = strength of disorder
-#    h_x and h_z = disordered fields.
-def hamiltonian_sim(n: int, k_order: int, time, w: int, h_x, h_z):
     qr = QuantumRegister(n)
     cr = ClassicalRegister(n)
     qc = QuantumCircuit(qr, cr, name="Hamiltonian")
-    angle = time / k_order
+    angle = t / K
 
-    # Create binary state of "10101010..."
     for i in range(0, n, 2):
         qc.x(qr[i])
     qc.barrier()
 
-    # Apply k amount of trotterization steps
-    for i in range(k_order):
+    for i in range(K):
 
         # Pauli spin
         for j in range(n):
@@ -165,21 +125,20 @@ def hamiltonian_sim(n: int, k_order: int, time, w: int, h_x, h_z):
         # Apply xx_gate:
         for j in range(2):
             for k in range(j % 2, n - 1, 2):
-                qc.append(xx_gate(angle).to_instruction(), [qr[k], qr[(k + 1) % n]])
+                qc.rxx(angle, qr[k], qr[(k + 1) % n])
 
         # Apply yy_gate:
         for j in range(2):
             for k in range(j % 2, n - 1, 2):
-                qc.append(yy_gate(angle).to_instruction(), [qr[k], qr[(k + 1) % n]])
+                qc.ryy(angle, qr[k], qr[(k + 1) % n])
 
         # Apply zz_gate:
         for j in range(2):
             for k in range(j % 2, n - 1, 2):
-                qc.append(zz_gate(angle).to_instruction(), [qr[k], qr[(k + 1) % n]])
+                qc.rzz(angle, qr[k], qr[(k + 1) % n])
 
         qc.barrier()
 
-    # Measure all qubits
     for qubit in range(n):
         qc.measure(qr[qubit], cr[qubit])
 
@@ -192,9 +151,7 @@ def hamiltonian_sim(n: int, k_order: int, time, w: int, h_x, h_z):
 def bench_qiskit_ft(benchmark, optimization_level, backend):
     shots = 65536
     # Generate binary string based on number of qubits
-    binary_string = ""
-    for i in range(NUM_QUBITS):
-        binary_string += "1" if i % 2 == 0 else "0"
+    binary_string = "".join(["1" if i % 2 == 0 else "0" for i in range(NUM_QUBITS)])
     binary_string = binary_string[::-1]
     expected_counts = {binary_string: shots}
     benchmark.name = "Hamiltonian Simulation"
