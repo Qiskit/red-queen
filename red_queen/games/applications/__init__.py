@@ -54,12 +54,12 @@ def run_qiskit_circuit(
         num_1q = op_count.get("sx", 0) + op_count.get("x", 0) + op_count.get("rz", 0)
     info.quality_stats["xi"] = num_2q / (num_1q + num_2q)
     if marginalize:
-        
+
         counts = marginal_distribution(
-                backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts(),
-                [marginalize],
-            )
+            backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts(),
+            [marginalize],
+        )
     else:
         counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
-        
+
     info.quality_stats["fidelity"] = hellinger_fidelity(counts, expected_counts)

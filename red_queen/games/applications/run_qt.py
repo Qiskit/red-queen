@@ -13,7 +13,6 @@ from qiskit import IBMQ, Aer, transpile
 from red_queen.games.applications import backends, run_qiskit_circuit
 
 
-
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
 state = [1 / np.sqrt(2), -1 / np.sqrt(2)]
 
