@@ -12,8 +12,6 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit import IBMQ, Aer, transpile
 from red_queen.games.applications import backends, run_qiskit_circuit
 
-# from __init__ import backends, run_qiskit_circuit
-from qiskit.extensions import Initialize
 
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
@@ -83,7 +81,7 @@ def bench_quantum_teleportation(benchmark, optimization_level, backend):
     circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "quantum_teleportation.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(
-        benchmark, circ, backend, optimization_level, shots, expected_counts, marginalize=1
+        benchmark, circ, backend, optimization_level, shots, expected_counts, marginalize=2
     )
 
 
