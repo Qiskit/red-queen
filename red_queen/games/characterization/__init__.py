@@ -1,26 +1,20 @@
 import pytest
 from qiskit.compiler import transpile
-from qiskit.providers.fake_provider import (
-    FakeMontreal
-)
+from qiskit.providers.fake_provider import FakeMontreal
 
-backends = [
-    FakeMontreal()
-]
+backends = [FakeMontreal()]
 
 # Get heavy outputs (Will be removed/modified)
 
+
 def measure_qv(circuits, benchmark, backend, shots=1000):
-        results = []
-        for index, circuit in enumerate(circuits):
-            info, tqc = benchmark(
-                transpile,
-                circuit,
-                backend,
-                seed_transpiler=918273645
-            )
-            results.append(backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts())
-        return results
+    results = []
+    for index, circuit in enumerate(circuits):
+        info, tqc = benchmark(transpile, circuit, backend, seed_transpiler=918273645)
+        results.append(
+            backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
+        )
+    return results
 
 
 def get_heavy_outputs(counts):
@@ -73,10 +67,3 @@ def run_qiskit_quntum_volume(benchmark, circuits, backend, shots):
             heavy_outputs = [get_heavy_outputs(qc) for qc in counts]
             heavy_count = count_heavy_outputs(counts, heavy_outputs)
             thres_pass, threshold = check_threshold(heavy_count, len(circuit), shots)
-    
-
-
-
-            
-
-
