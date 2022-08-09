@@ -107,7 +107,7 @@ def hs_circuit(num_qubits, secret_string):
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
-def bench_qiskit_hs(benchmark, optimization_level, backend, method):
+def bench_qiskit_hs(benchmark, optimization_level, backend):
     """benchmarking for hidden_shift"""
     shots = 33333
     expected_counts = {SECRET_STRING: shots}
