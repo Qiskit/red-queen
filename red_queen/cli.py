@@ -40,8 +40,6 @@ def complier_retrieval():
     for complier in config["pytest"]["markers"].split("\n"):
         if complier != "":
             list_of_compliers.append(complier)
-    # print(complier_list)
-    # This line tests to see if there is a complier specifed
     return list_of_compliers
 
 
@@ -59,10 +57,6 @@ def result_retrieval():
 def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
     command_list = ["pytest"]
     compiler_command = [m_tag, compiler, "--store"]
-    # command_list.append(pytest_paths)
-    click.echo("benchmarks ran")
-    # click.echo(pytest_paths)
-    click.echo(f"sys.executable pytest -s {pytest_paths} {m_tag} {compiler} --store".split())
     if platform.system() == "Windows":
         command_list.insert(0, "-m")
         command_list.insert(0, "python")
@@ -71,7 +65,6 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
             command_list.append(string)
         for _, string in enumerate(compiler_command):
             command_list.append(string)
-        # click.echo(command_list)
         subprocess.run(
             command_list,
             check=True,
@@ -81,8 +74,6 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
             command_list.append(string)
         for _, string in enumerate(compiler_command):
             command_list.append(string)
-        # proper_command = " ".join(command_list)
-        # click.echo(proper_command)
         subprocess.run(
             command_list,
             check=True,
@@ -91,14 +82,19 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
 
 def show_result():
     results_dict = result_retrieval()
-    click.echo(results_dict)
     result_num = max(results_dict.keys())
-    click.echo(result_num)
     result_path = tuple(results_dict[result_num].values())[0]
-    command = f"python3 -m report.console_tables --storage {result_path}"
-    subprocess.run([command], check=True)
+    command_list = ["python3", "-m", "report.console_tables", "--storage"]
+    command_list.append(str(result_path))
+    subprocess.run(
+        command_list,
+        check=True,
+        )
     click.echo(
-        f"To view the results chart type:\npython -m report.console_tables --storage {result_path}"
+        "To view the table again:"
+    )
+    click.echo(
+        " ".join(command_list)
     )
 
 
@@ -189,4 +185,5 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    show_result()
