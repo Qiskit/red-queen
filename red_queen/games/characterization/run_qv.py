@@ -33,7 +33,7 @@ def generate_qv_circuits(num_qubits, numtrials=100):
 @pytest.mark.qiskit
 @pytest.mark.parametrize("backend", backends)
 def bench_qiskit_qv(benchmark, backend):
-    shots = 1000
+    shots = 50
     benchmark.name = "Quantum Volume"
     run_qiskit_quntum_volume(benchmark, CIRCUITS, backend, shots)
 

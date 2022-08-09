@@ -61,9 +61,15 @@ def run_qiskit_quntum_volume(benchmark, circuits, backend, shots):
     current = 2
     thres_pass = True
     threshold = 0
-    while thres_pass and current < 11:
-        for index, circuit in enumerate(circuits):
-            counts = measure_qv(circuit, benchmark, backend, shots)
-            heavy_outputs = [get_heavy_outputs(qc) for qc in counts]
-            heavy_count = count_heavy_outputs(counts, heavy_outputs)
-            thres_pass, threshold = check_threshold(heavy_count, len(circuit), shots)
+    for index, circuit in enumerate(circuits):
+        current = index+2
+        counts = measure_qv(circuit, benchmark, backend, shots)
+        heavy_outputs = [get_heavy_outputs(qc) for qc in counts]
+        heavy_count = count_heavy_outputs(counts, heavy_outputs)
+        thres_pass, threshold = check_threshold(heavy_count, len(circuit), shots)
+        print("Current Quantum Volume Test:", 2**current)
+        print("\tAccepted" if thres_pass else "\tNot accepted")
+        if not thres_pass:
+            break
+    print("Max Quantum Volume:", 2**current)
+
