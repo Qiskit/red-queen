@@ -62,7 +62,7 @@ def run_qiskit_quntum_volume(benchmark, circuits, backend, shots):
     thres_pass = True
     threshold = 0
     for index, circuit in enumerate(circuits):
-        current = index+2
+        current = index + 2
         counts = measure_qv(circuit, benchmark, backend, shots)
         heavy_outputs = [get_heavy_outputs(qc) for qc in counts]
         heavy_count = count_heavy_outputs(counts, heavy_outputs)
@@ -72,4 +72,3 @@ def run_qiskit_quntum_volume(benchmark, circuits, backend, shots):
         if not thres_pass:
             break
     print("Max Quantum Volume:", 2**current)
-
