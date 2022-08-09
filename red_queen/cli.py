@@ -89,13 +89,9 @@ def show_result():
     subprocess.run(
         command_list,
         check=True,
-        )
-    click.echo(
-        "To view the table again:"
     )
-    click.echo(
-        " ".join(command_list)
-    )
+    click.echo("To view the table again:")
+    click.echo(" ".join(command_list))
 
 
 benchmark_category, benchmark_types, benchmarks = benchmark_retrieval()
