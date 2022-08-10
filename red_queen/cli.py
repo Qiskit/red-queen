@@ -1,12 +1,18 @@
+#!/usr/bin/env python3
 # ------------------------------------------------------------------------------
 # Part of Red Queen Project.  This file is distributed under the Apache 2.0.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-"""The purpose of this code below is to make the user experience of the Red Queen benchmark suite more steamlined.
-The code achieves that by collecting all avaiable benchmark alongside their paths, and uses this information to
-create exacutable pytest code that will exacute the benchmarks for users with worrying about the nuisances of
-the pytest framework. The scope of this cli will grow with time."""
-#!/usr/bin/env python3
+
+"""The purpose of this code below is to make the user experience of
+the Red Queen benchmark suite more steamlined
+
+The code achieves that by collecting all avaiable benchmark alongside their paths,
+and uses this information to create exacutable pytest code that
+will exacute the benchmarks for users with worrying about the
+nuisances ofthe pytest framework. The scope of this cli will
+grow with time.
+"""
 import os
 import platform
 import subprocess
@@ -141,7 +147,6 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
     j = 0
     ### Has a benchmark type been specified?
     if len(benchmarkType) > 0:
-        # click.echo("passed test 0")
         while i < len(benchmarkType):
             ### Is the inputted benchmark type valid?
             if set(benchmarkType).issubset(benchmark_category):
@@ -157,7 +162,7 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
                                 )
                             pytest_paths = benchmark_paths
                             run_benchmarks(pytest_paths, m_tag, compiler)
-                            # show_result()
+                            show_result()
                             i += 1
                 else:
                     mydict = benchmark_category[benchmarkType[0]]
