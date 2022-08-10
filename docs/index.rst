@@ -1,5 +1,5 @@
 ===========================================
-Welcome to the documentation of qiskit-neko
+Welcome to the documentation of red-queen
 ===========================================
 
 .. toctree::

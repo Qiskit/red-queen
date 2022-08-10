@@ -15,7 +15,7 @@
 # under the License.
 
 #
-# qiskit-neko documentation build configuration file
+# red-queen documentation build configuration file
 #
 
 import sys, os
@@ -23,8 +23,8 @@ import subprocess
 
 # General configuration:
 
-project = u'qiskit-neko'
-copyright = u'2022, Matthew Treinish'
+project = u'red-queen'
+copyright = u'2022, The Red Queen Contributors'
 
 
 # The short X.Y version.
@@ -50,7 +50,7 @@ pygments_style = 'colorful'
 
 add_module_names = False
 
-modindex_common_prefix = ['qiskit_neko.']
+modindex_common_prefix = ['red-queen.']
 
 todo_include_todos = True
 
@@ -74,7 +74,7 @@ html_theme_options = {
     'style_external_links': True,
 }
 
-htmlhelp_basename = 'qiskit-neko'
+htmlhelp_basename = 'red-queen'
 
 # Intersphinx configuration
 intersphinx_mapping = {
