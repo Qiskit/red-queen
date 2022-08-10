@@ -22,7 +22,7 @@ runs:
           if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" == *"${{ inputs.path }}/__init__.py"* ]]; then
               no_init=${${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}//"${{ inputs.path }}/__init__.py"/}
               if [[ "$no_init" == "" ]]; then
-                  pytest ${{ inputs.default-bench }} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
+                  pytest ${{ inputs.default_bench }} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
               else
                   pytest "$no_init" -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
               fi
