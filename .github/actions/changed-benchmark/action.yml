@@ -1,0 +1,33 @@
+name: 'Run Changed Benchmarks'
+description: 'Run Changed Benchmarks'
+inputs:
+  path:
+    description: 'Benchmark paths'
+    required: true
+  default_bench:
+    description: 'Default benchmark'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Get changes in applications
+      id: changed-benchmarks
+      uses: tj-actions/changed-files@v24.1
+      with:
+        files: |
+          ${{ inputs.path }}
+    - name: Test applications
+      run: |
+        if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" != "" ]]; then
+          if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" == *"${{ inputs.path }}/__init__.py"* ]]; then
+              no_init=${${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}//"${{ inputs.path }}/__init__.py"/}
+              if [[ "$no_init" == "" ]]; then
+                  pytest ${{ inputs.default_bench }} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
+              else
+                  pytest "$no_init" -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
+              fi
+          else
+            pytest ${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
+          fi
+        fi
+      shell: bash
