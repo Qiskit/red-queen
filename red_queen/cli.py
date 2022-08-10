@@ -2,9 +2,9 @@
 # Part of Red Queen Project.  This file is distributed under the Apache 2.0.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
-"""The purpose of this code below is to make the user experience of the Red Queen benchmark suite more steamlined. 
+"""The purpose of this code below is to make the user experience of the Red Queen benchmark suite more steamlined.
 The code achieves that by collecting all avaiable benchmark alongside their paths, and uses this information to
-create exacutable pytest code that will exacute the benchmarks for users with worrying about the nuisances of 
+create exacutable pytest code that will exacute the benchmarks for users with worrying about the nuisances of
 the pytest framework. The scope of this cli will grow with time."""
 #!/usr/bin/env python3
 import os
@@ -179,5 +179,4 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
 
 
 if __name__ == "__main__":
-    # main()
-    show_result()
+    main()
