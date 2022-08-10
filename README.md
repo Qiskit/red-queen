@@ -40,7 +40,7 @@ the required packages:
 
 ```bash
 cd red-queen
-pip install red-queen
+pip install .
 ```
 
 
