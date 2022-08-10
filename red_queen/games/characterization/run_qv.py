@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pytest
-from red_queen.games.characterization import backends, run_qiskit_quntum_volume
+from red_queen.games.characterization import backends, run_qiskit_quantum_volume
 
 # Importing standard Qiskit libraries
 from qiskit import QuantumCircuit, transpile, Aer, IBMQ, execute
@@ -35,7 +35,7 @@ def generate_qv_circuits(num_qubits, numtrials=100):
 def bench_qiskit_qv(benchmark, backend):
     shots = 50
     benchmark.name = "Quantum Volume"
-    run_qiskit_quntum_volume(benchmark, CIRCUITS, backend, shots)
+    run_qiskit_quantum_volume(benchmark, CIRCUITS, backend, shots)
 
 
 if __name__ == "__main__":
