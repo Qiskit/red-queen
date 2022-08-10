@@ -102,7 +102,6 @@ complier_list = complier_retrieval()
 
 
 @click.command()
-# @click.option("--version", action="version", version="%(prog)s 0.0.1")
 @click.option(
     "-c",
     "--compiler",
