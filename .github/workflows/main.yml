@@ -45,48 +45,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install .
-      - name: Get changes in applications
-        id: changes-applications
-        uses: tj-actions/changed-files@v24.1
+      - name: Run changed application benchmarks
+        uses: ./.github/actions/changed-benchmark
         with:
-          files: |
-            red_queen/games/applications/*py
-      - name: Test applications
-        run: |
-          if [[ "${{steps.changes-applications.outputs.all_changed_and_modified_files}}" != "" ]]; then
-            if [[ "${{steps.changes-applications.outputs.all_changed_and_modified_files}}" == *"red_queen/games/applications/__init__.py"* ]]; then
-                no_init=${${{steps.changes-applications.outputs.all_changed_and_modified_files}}//"red_queen/games/applications/__init__.py"/}
-                echo "$no_init"
-                if [[ "$no_init" == "" ]]; then
-                    pytest red_queen/games/applications/run_bv.py -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
-                else
-                    pytest "$no_init" -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
-                fi
-            else
-              pytest ${{steps.changes-applications.outputs.all_changed_and_modified_files}} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
-            fi
-          fi 
-      - name: Get changes in mapping
-        id: changes-mapping
-        uses: tj-actions/changed-files@v24.1
+            path: red_queen/games/applications
+            default_bench: red_queen/games/applications/run_bv.py
+      - name: Run changed mapping benchmarks
+        uses: ./.github/actions/changed-benchmark
         with:
-          files: |
-            red_queen/games/mapping/*py
-      - name: Test mapping
-        run: |
-          if [[ "${{steps.changes-mapping.outputs.all_changed_and_modified_files}}" != "" ]]; then
-            if [[ "${{steps.changes-mapping.outputs.all_changed_and_modified_files}}" == *"red_queen/games/mapping/__init__.py"* ]]; then
-                no_init=${${{steps.changes-mapping.outputs.all_changed_and_modified_files}}//"red_queen/games/mapping/__init__.py"/}
-                echo "$no_init"
-                if [[ "$no_init" == "" ]]; then
-                    pytest red_queen/games/mapping/map_misc.py -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
-                else
-                    pytest "$no_init" -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
-                fi
-            else
-              pytest ${{steps.changes-mapping.outputs.all_changed_and_modified_files}} -n 2 -k "not backend0 and not backend1 and not backend2" --verbose --store
-            fi
-          fi 
+            path: red_queen/games/mapping
+            default_bench:  red_queen/games/mapping/map_misc.py
       - name: Print results to log
         run: python -m report.console_tables --storage results/
       - name: Upload original result file
