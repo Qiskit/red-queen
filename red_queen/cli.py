@@ -151,7 +151,6 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
                 if len(benchmark) > 0:
                     ### Are the inputted benchmark(s) valid?
                     if set(benchmark).issubset(benchmarks):
-                        # click.echo("passed test 3")
                         ### Is the inputted benchmark within the inputted benchmark type suite?
                         if set(benchmark).issubset(set(benchmark_category[benchmarkType[i]])):
                             # click.echo("passed test 4")
