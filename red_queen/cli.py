@@ -145,7 +145,6 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
         while i < len(benchmarkType):
             ### Is the inputted benchmark type valid?
             if set(benchmarkType).issubset(benchmark_category):
-                # click.echo("passed test 1")
                 ### Has a benchmark been specified?
                 if len(benchmark) > 0:
                     ### Are the inputted benchmark(s) valid?
