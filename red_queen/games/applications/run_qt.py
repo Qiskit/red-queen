@@ -80,7 +80,7 @@ def bench_quantum_teleportation(benchmark, optimization_level, backend):
     circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "quantum_teleportation.qasm"))
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(
-        benchmark, circ, backend, optimization_level, shots, expected_counts, marginalize=2
+        benchmark, circ, backend, optimization_level, shots, expected_counts, marginalize=[2]
     )
 
 

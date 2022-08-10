@@ -4,8 +4,6 @@
 # ------------------------------------------------------------------------------
 
 """Benchmarks of application circuits."""
-
-from re import M
 import pytest
 
 from qiskit.compiler import transpile
@@ -57,7 +55,7 @@ def run_qiskit_circuit(
 
         counts = marginal_distribution(
             backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts(),
-            [marginalize],
+            marginalize,
         )
     else:
         counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
