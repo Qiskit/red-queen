@@ -149,7 +149,6 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
                 # click.echo("passed test 1")
                 ### Has a benchmark been specified?
                 if len(benchmark) > 0:
-                    # click.echo("passed test 2")
                     ### Are the inputted benchmark(s) valid?
                     if set(benchmark).issubset(benchmarks):
                         # click.echo("passed test 3")
