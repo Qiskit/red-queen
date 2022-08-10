@@ -2,10 +2,6 @@
 Welcome to the documentation of red-queen
 ===========================================
 
-.. toctree::
-
-    config
-    api
 
 
 Indices and tables
