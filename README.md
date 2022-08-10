@@ -9,9 +9,8 @@
 > [Carroll, Lewis: Through the Looking-Glass, Chapter 2](
     https://www.gutenberg.org/files/12/12-h/12-h.htm)
 
-<br>
 
-<h1>About</h1>
+# About
 
 The Red Queen benchmark framework was created to facilitate the benchmarking
 algorithms used in quantum compilation.
@@ -21,9 +20,8 @@ effectively, you should know the basics of `pytest` first. Take a look at the
 [introductory material](https://docs.pytest.org/en/latest/getting-started.html).
 
 
-<br>
 
-<h1>Usage</h1>
+# Usage
 
 
 Red Queen is a framework for benchmarking quantum compilation algorithms. Since
@@ -46,11 +44,9 @@ pip install .
 
 Red Queen has a `CLI` (command line interface) that you can use to execute benchmarks. 
 
-<br>
 
 The general templete for the `CLI` is as follows:
 
-<br>
 
 
 ```bash
@@ -62,7 +58,6 @@ Now, suppose you want to run the mapping benchmarks using only `tweedledum`.
 You can do this via the `CLI` or with `pytest`
 
 
-<br>
 
 [For MacOs and Linux]
 
@@ -78,7 +73,6 @@ With `pytest`
 python -m pytest games/mapping/map_queko.py -m tweedledum --store
 ```
 
-<br>
 
 [For Windows]
 
@@ -101,7 +95,6 @@ stdin handling.
 ```bash
 python -m pytest -s games/mapping/map_queko.py -m tweedledum --store
 ```
-<br>
 
 
 
@@ -115,7 +108,6 @@ use:
 python -m report.console_tables --storage results/0001_bench.json
 ```
 
-<br>
 
 ## Warning
 
