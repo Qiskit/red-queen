@@ -15,7 +15,7 @@ runs:
       uses: tj-actions/changed-files@v24.1
       with:
         files: |
-          ${{ inputs.path }}
+          ${{ inputs.path }}/*.py
     - name: Test applications
       run: |
         if [[ "${{steps.changed-benchmarks.outputs.all_changed_and_modified_files}}" != "" ]]; then
