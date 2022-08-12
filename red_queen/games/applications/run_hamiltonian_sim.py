@@ -148,7 +148,7 @@ def hamiltonian_sim(n: int, K: int, t, w: int, h_x, h_z):
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
-def bench_qiskit_ft(benchmark, optimization_level, backend):
+def bench_qiskit_hamiltonian_sim(benchmark, optimization_level, backend):
     shots = 65536
     # Generate binary string based on number of qubits
     binary_string = "".join(["1" if i % 2 == 0 else "0" for i in range(NUM_QUBITS)])
