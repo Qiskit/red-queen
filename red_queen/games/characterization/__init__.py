@@ -1,8 +1,26 @@
 import pytest
 from qiskit.compiler import transpile
-from qiskit.providers.fake_provider import FakeMontreal
+from qiskit.providers.fake_provider import (
+    FakeWashington,
+    FakeBrooklyn,
+    FakeRochester,
+    FakeMontreal,
+    FakeCairo,
+    FakeToronto,
+    FakeGuadalupe,
+    FakeMelbourne,
+)
 
-backends = [FakeMontreal()]
+backends = [
+    FakeWashington(),
+    FakeBrooklyn(),
+    FakeRochester(),
+    FakeMontreal(),
+    FakeCairo(),
+    FakeToronto(),
+    FakeGuadalupe(),
+    FakeMelbourne(),
+]
 
 # Get heavy outputs (Will be removed/modified)
 
@@ -67,10 +85,10 @@ def run_qiskit_quantum_volume(benchmark, circuits, backend, shots):
         heavy_outputs = [get_heavy_outputs(qc) for qc in counts]
         heavy_count = count_heavy_outputs(counts, heavy_outputs)
         thres_pass, threshold = check_threshold(heavy_count, len(circuit), shots)
-        print("Current Quantum Volume Test:", 2**current)
-        print("\tAccepted" if thres_pass else "\tNot accepted")
         if not thres_pass:
             current -= 1
             break
     print("Max Quantum Volume:", 2**current)
     benchmark.info.quality_stats["QV"] = 2**current
+    benchmark.info.quality_stats["Threshold"] = threshold
+    benchmark.info.quality_stats["num_quits"] = current
