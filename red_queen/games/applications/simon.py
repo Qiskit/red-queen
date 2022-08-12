@@ -78,19 +78,12 @@ def binary_dotz(binary, ZZZ):
     return accum % 2
 
 
-# for zzz in expected_counts:
-#     print(f"{BINARY_STRING}.{zzz} = {binary_dotz(BINARY_STRING, zzz)} (mod 2)")
-
-
 @pytest.mark.qiskit
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
 def bench_qiskit_simon(benchmark, optimization_level, backend):
     """benchmarking for simon"""
-    # use local simulator
-    # aer_sim = Aer.get_backend("aer_simulator")
-    # results = aer_sim.run(qobj).result()
-    expected_counts = results.get_counts()
+    shots = 33333
     expected_counts = {BINARY_STRING: shots}
     benchmark.name = "Simon's Algorithm"
     circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "simon.qasm"))
