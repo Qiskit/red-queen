@@ -57,7 +57,7 @@ def check_threshold(nheavies, ncircuits, nshots):
     return bool(numerator / (ncircuits * nshots) > 2 / 3), numerator / (ncircuits * nshots)
 
 
-def run_qiskit_quntum_volume(benchmark, circuits, backend, shots):
+def run_qiskit_quantum_volume(benchmark, circuits, backend, shots):
     current = 2
     thres_pass = True
     threshold = 0
@@ -70,5 +70,7 @@ def run_qiskit_quntum_volume(benchmark, circuits, backend, shots):
         print("Current Quantum Volume Test:", 2**current)
         print("\tAccepted" if thres_pass else "\tNot accepted")
         if not thres_pass:
+            current -= 1
             break
     print("Max Quantum Volume:", 2**current)
+    benchmark.info.quality_stats["QV"] = 2**current
