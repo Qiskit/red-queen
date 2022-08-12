@@ -38,9 +38,6 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.extlinks',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
-              'jupyter_sphinx',
-              'reno.sphinxext',
-              'sphinx.ext.intersphinx',
              ]
 html_static_path = ['_static']
 templates_path = ['_templates']
@@ -75,8 +72,3 @@ html_theme_options = {
 }
 
 htmlhelp_basename = 'red-queen'
-
-# Intersphinx configuration
-intersphinx_mapping = {
-    'qiskit': ('https://qiskit.org/documentation/', None),
-}
