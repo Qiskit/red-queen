@@ -76,6 +76,15 @@ def check_threshold(nheavies, ncircuits, nshots):
 
 
 def run_qiskit_quantum_volume(benchmark, circuits, backend, shots):
+    """Run quantum volume on a backend. It will stop once the threshold test fails.
+    Args:
+        benchmark (BenchmarkFixture): Contains the benchmark to be run.
+        circuits (List(List(QuantumCircuit))): Contains all the randomized Quantum Volume Circuits.
+        backend: Backend that the circuits will run in.
+        shots (int): Number of times the circuit will run and be measured.
+    Returns:
+        Void
+    """
     current = 2
     thres_pass = True
     threshold = 0
@@ -84,11 +93,11 @@ def run_qiskit_quantum_volume(benchmark, circuits, backend, shots):
         counts = measure_qv(circuit, benchmark, backend, shots)
         heavy_outputs = [get_heavy_outputs(qc) for qc in counts]
         heavy_count = count_heavy_outputs(counts, heavy_outputs)
-        thres_pass, threshold = check_threshold(heavy_count, len(circuit), shots)
+        thres_pass, temp_threshold = check_threshold(heavy_count, len(circuit), shots)
         if not thres_pass:
             current -= 1
+            threshold = temp_threshold
             break
-    print("Max Quantum Volume:", 2**current)
     benchmark.info.quality_stats["QV"] = 2**current
     benchmark.info.quality_stats["Threshold"] = threshold
     benchmark.info.quality_stats["num_quits"] = current
