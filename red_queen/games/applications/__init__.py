@@ -4,10 +4,10 @@
 # ------------------------------------------------------------------------------
 
 """Benchmarks of application circuits."""
-
 import pytest
 
 from qiskit.compiler import transpile
+from qiskit.result import marginal_distribution
 from qiskit.providers.fake_provider import (
     FakeWashington,
     FakeBrooklyn,
@@ -32,7 +32,9 @@ backends = [
 ]
 
 
-def run_qiskit_circuit(benchmark, circuit, backend, optimization_level, shots, expected_counts):
+def run_qiskit_circuit(
+    benchmark, circuit, backend, optimization_level, shots, expected_counts, marginalize=None
+):
     info, tqc = benchmark(
         transpile,
         circuit,
@@ -49,5 +51,13 @@ def run_qiskit_circuit(benchmark, circuit, backend, optimization_level, shots, e
     else:
         num_1q = op_count.get("sx", 0) + op_count.get("x", 0) + op_count.get("rz", 0)
     info.quality_stats["xi"] = num_2q / (num_1q + num_2q)
-    counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
+    if marginalize:
+
+        counts = marginal_distribution(
+            backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts(),
+            marginalize,
+        )
+    else:
+        counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
+
     info.quality_stats["fidelity"] = hellinger_fidelity(counts, expected_counts)
