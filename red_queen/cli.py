@@ -79,6 +79,8 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
             check=True,
         )
     else:
+        command_list.insert(0, "-m")
+        command_list.insert(0, "python")
         for _, string in enumerate(pytest_paths):
             command_list.append(string)
         for _, string in enumerate(compiler_command):
@@ -93,7 +95,7 @@ def show_result():
     results_dict = result_retrieval()
     result_num = max(results_dict.keys())
     result_path = tuple(results_dict[result_num].values())[0]
-    command_list = ["python3", "-m", "report.console_tables", "--storage"]
+    command_list = ["sys.executable", "-m", "report.console_tables", "--storage"]
     command_list.append(str(result_path))
     subprocess.run(
         command_list,
