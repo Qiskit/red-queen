@@ -1,4 +1,4 @@
-# QUEKO - Quantum Mapping Examples with Known Optimal
+# MQT Bench - Quantum Benchmarking Examples with Known Optimal
 
 This is the benchmark circuits used in this [paper](https://arxiv.org/abs/2104.14722).
 ```
