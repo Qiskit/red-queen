@@ -95,7 +95,7 @@ def show_result():
     results_dict = result_retrieval()
     result_num = max(results_dict.keys())
     result_path = tuple(results_dict[result_num].values())[0]
-    command_list = ["sys.executable", "-m", "report.console_tables", "--storage"]
+    command_list = ["python", "-m", "report.console_tables", "--storage"]
     command_list.append(str(result_path))
     subprocess.run(
         command_list,
