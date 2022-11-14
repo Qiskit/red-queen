@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Part of Red Queen Project.  This file is distributed under the MIT License.
+# Part of Red Queen Project. This file is distributed under the Apache 2.0 License.
 # See accompanying file /LICENSE for details.
 # ------------------------------------------------------------------------------
 
