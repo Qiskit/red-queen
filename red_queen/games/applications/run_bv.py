@@ -4,7 +4,6 @@
 # ------------------------------------------------------------------------------
 
 """Benchmark Bernstein Vazirani circuits."""
-
 import os
 
 import pytest
@@ -13,14 +12,35 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 from red_queen.games.applications import backends, run_qiskit_circuit
 
+import random
+
+import numpy
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
-SECRET_STRING = "110011"
 
 
+@pytest.fixture
+def get_num_qubits(request):
+    return request.config.getoption("--num_qubits")
+
+
+def generate_num_qubits(get_num_qubits):
+    user_params = requests.get(get_num_qubits)
+    user_params = user_params.split(":")
+    if user_params[0] == "linear":
+        sweep_list = numpy.linspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep_list = [int(i) for i in sweep_list]
+    if user_params[0] == "log":
+        sweep_list = numpy.logspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep_list = [int(i) for i in sweep_list]
+    for i in sweep_list:
+        num_qubits = i
+        SECRET_STRING = bin(random.getrandbits(i - 1))[2:]
+
+
+@pytest.mark.parametrize("num_qubits", sweep_list)
 def build_bv_circuit(secret_string, mid_circuit_measure=False):
     input_size = len(secret_string)
-    num_qubits = input_size + 1
     if not mid_circuit_measure:
         qr = QuantumRegister(num_qubits)
         cr = ClassicalRegister(input_size)

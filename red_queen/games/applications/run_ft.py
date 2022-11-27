@@ -23,12 +23,31 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 DIRECTORY = "qasm"
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY)
-SECRET_STRING = "11111111"
+
+
+@pytest.fixture
+def get_num_qubits(request):
+    return request.config.getoption("--num_qubits")
+
+
+def generate_num_qubits(get_num_qubits):
+    user_params = requests.get(get_num_qubits)
+    user_params = user_params.split(":")
+    if user_params[0] == "linear":
+        sweep_list = np.linspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep_list = [int(i) for i in sweep_list]
+    if user_params[0] == "log":
+        sweep_list = np.logspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep_list = [int(i) for i in sweep_list]
+    for i in sweep_list:
+        num_qubits = i
+        SECRET_STRING = bin(random.getrandbits(i - 1))[2:]
 
 
 """ Generates Quantum Fourier Transform circuit using QFT and Inverse QFT"""
 
 
+@pytest.mark.parametrize("num_qubits", sweep_list)
 def generate_ft_circuit_1(binary):
     qubits = QuantumRegister(len(binary))
     bits = ClassicalRegister(len(binary))
