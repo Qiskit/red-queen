@@ -34,7 +34,7 @@ def get_num_qubits(request):
     return sweep
 
 
-sweep_list = requests.get(get_num_qubits)
+sweep_list = list(requests.get(get_num_qubits))
 default_secret_string = "110011"
 
 
@@ -81,10 +81,9 @@ def build_bv_circuit(secret_string, mid_circuit_measure=False):
 @pytest.mark.parametrize("num_qubits", sweep_list)
 def bench_qiskit_bv(benchmark, optimization_level, backend, method, num_qubits):
     shots = 65536
-    SECRET_STRING = bin(random.getrandbits(num_qubits - 1))[2:]
+    SECRET_STRING = str(bin(random.getrandbits(num_qubits - 1))[2:].zfill(num_qubits-1))
     expected_counts = {SECRET_STRING: shots}
-    circ = build_bv_circuit(SECRET_STRING)
-    run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
+
     if method == "normal":
         benchmark.name = "Bernstein Vazirani"
         circ = build_bv_circuit(SECRET_STRING)
@@ -97,6 +96,4 @@ def bench_qiskit_bv(benchmark, optimization_level, backend, method, num_qubits):
 
 if __name__ == "__main__":
     build_bv_circuit(default_secret_string).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
-    build_bv_circuit(default_secret_string, True).qasm(
-        filename=os.path.join(QASM_DIR, "bv_mcm.qasm")
-    )
+    build_bv_circuit(default_secret_string, True).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))

@@ -49,7 +49,7 @@ def pytest_addoption(parser):
     )
     group.addoption(
 	"--num_qubits",
-        default="Linear:10:100:50",
+        default="linear:10:100:50",
         help="",
     )
  

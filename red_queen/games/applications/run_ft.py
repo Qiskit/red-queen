@@ -17,6 +17,7 @@ import pytest
 from red_queen.games.applications import backends, run_qiskit_circuit
 import numpy as np
 import requests
+import random
 
 # Importing standard Qiskit libraries
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
@@ -108,7 +109,7 @@ def generate_ft_circuit_2(binary):
 @pytest.mark.parametrize("num_qubits", sweep_list)
 def bench_qiskit_ft(benchmark, optimization_level, backend, method, num_qubits):
     shots = 65536
-    SECRET_STRING = bin(random.getrandbits(num_qubits - 1))[2:]
+    SECRET_STRING = str(bin(random.getrandbits(num_qubits - 1))[2:].zfill(num_qubits-1))
     integer_value = int(SECRET_STRING, 2)
     binary_1 = format((integer_value + 1) % (2 ** (len(SECRET_STRING))), "b").zfill(
         len(SECRET_STRING)
