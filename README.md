@@ -32,15 +32,43 @@ is is still in early development, you must clone this repository to use it:
 git clone git@github.com:Qiskit/red-queen.git
 ```
 
-To run benchmarks, you must first go to the `red-queen` directory and install
-the required packages:
+Since Red Queen is a Python package is version control is very important, therefore using a virtual enviornment to run benchmarks is highly recomended.
 
+To get into Red Queen repository
 
 ```bash
 cd red-queen
-pip install .
 ```
 
+To create a virtual environment
+
+```bash
+python -m venv .virtualenv
+```
+After you create the virtual enviornment you need to activate it
+
+To activate the virtual enviornment
+
+[For MacOs and Linux]
+
+```bash
+source .virtualenv/bin/activate
+```
+
+[For Windows]
+
+```bash
+.virtualenv\Scripts\activate.bat
+```
+
+Lastly you need to install all of the neccessary dependencies for Red Queen
+
+```bash
+pip install -e .
+```
+With all that you are ready to start using Red Queen.
+
+<br>
 
 Red Queen has a `CLI` (command line interface) that you can use to execute benchmarks. 
 
