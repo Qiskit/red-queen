@@ -1,3 +1,4 @@
+mqt.bench
 matplotlib
 py-cpuinfo
 pytest
