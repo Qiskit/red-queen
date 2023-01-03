@@ -7,7 +7,7 @@
 import pytest
 
 from qiskit.compiler import transpile
-from qiskit.result import marginal_distribution
+from qiskit.result import marginal_counts
 from qiskit.providers.fake_provider import (
     FakeWashington,
     FakeBrooklyn,
@@ -33,7 +33,7 @@ backends = [
 
 
 def run_qiskit_circuit(
-    benchmark, circuit, backend, optimization_level, shots, expected_counts, marginalize=None
+    benchmark, circuit, backend, optimization_level, shots, expected_counts=None, marginalize=None
 ):
     info, tqc = benchmark(
         transpile,
@@ -53,11 +53,12 @@ def run_qiskit_circuit(
     info.quality_stats["xi"] = num_2q / (num_1q + num_2q)
     if marginalize:
 
-        counts = marginal_distribution(
+        counts = marginal_counts(
             backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts(),
             marginalize,
         )
     else:
         counts = backend.run(tqc, shots=shots, seed_simulator=123456789).result().get_counts()
 
-    info.quality_stats["fidelity"] = hellinger_fidelity(counts, expected_counts)
+    if expected_counts != None:
+        info.quality_stats["fidelity"] = hellinger_fidelity(counts, expected_counts)
