@@ -16,6 +16,8 @@ import os
 import pytest
 from red_queen.games.applications import backends, run_qiskit_circuit
 import numpy as np
+import requests
+import random
 
 # Importing standard Qiskit libraries
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
@@ -23,12 +25,29 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 DIRECTORY = "qasm"
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DIRECTORY)
-SECRET_STRING = "11111111"
+
+
+@pytest.fixture
+def get_num_qubits(request):
+    user_params = request.config.getoption("--num_qubits")
+    user_params = user_params.split(":")
+    if user_params[0] == "linear":
+        sweep = np.linspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep = [int(i) for i in sweep]
+    if user_params[0] == "log":
+        sweep = np.logspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep = [int(i) for i in sweep]
+    return sweep
+
+
+sweep_list = requests.get(get_num_qubits)
+default_secret_string = "110011"
 
 
 """ Generates Quantum Fourier Transform circuit using QFT and Inverse QFT"""
 
 
+@pytest.mark.parametrize("num_qubits", sweep_list)
 def generate_ft_circuit_1(binary):
     qubits = QuantumRegister(len(binary))
     bits = ClassicalRegister(len(binary))
@@ -87,8 +106,10 @@ def generate_ft_circuit_2(binary):
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
 @pytest.mark.parametrize("method", ["1", "2"])
-def bench_qiskit_ft(benchmark, optimization_level, backend, method):
+@pytest.mark.parametrize("num_qubits", sweep_list)
+def bench_qiskit_ft(benchmark, optimization_level, backend, method, num_qubits):
     shots = 65536
+    SECRET_STRING = str(bin(random.getrandbits(num_qubits - 1))[2:].zfill(num_qubits-1))
     integer_value = int(SECRET_STRING, 2)
     binary_1 = format((integer_value + 1) % (2 ** (len(SECRET_STRING))), "b").zfill(
         len(SECRET_STRING)
@@ -96,14 +117,15 @@ def bench_qiskit_ft(benchmark, optimization_level, backend, method):
     expected_counts = {binary_1: shots} if method == "1" else {SECRET_STRING: shots}
     if method == "1":
         benchmark.name = "Quantum Fourier Transform v1"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_1.qasm"))
+        circ = generate_ft_circuit_1(SECRET_STRING)
     else:
         benchmark.name = "Quantum Fourier Transform v2"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "ft_2.qasm"))
+        circ = generate_ft_circuit_2(SECRET_STRING)
+
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
 
 if __name__ == "__main__":
-    generate_ft_circuit_1(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "ft_1.qasm"))
-    generate_ft_circuit_2(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "ft_2.qasm"))
+    generate_ft_circuit_1(default_secret_string).qasm(filename=os.path.join(QASM_DIR, "ft_1.qasm"))
+    generate_ft_circuit_2(default_secret_string).qasm(filename=os.path.join(QASM_DIR, "ft_2.qasm"))

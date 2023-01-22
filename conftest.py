@@ -47,7 +47,12 @@ def pytest_addoption(parser):
         dest="store_data",
         help="",
     )
-
+    group.addoption(
+	"--num_qubits",
+        default="linear:10:100:50",
+        help="",
+    )
+ 
 
 @pytest.mark.trylast
 def pytest_configure(config):

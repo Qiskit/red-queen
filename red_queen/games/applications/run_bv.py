@@ -4,7 +4,6 @@
 # ------------------------------------------------------------------------------
 
 """Benchmark Bernstein Vazirani circuits."""
-
 import os
 
 import pytest
@@ -13,9 +12,30 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 from red_queen.games.applications import backends, run_qiskit_circuit
 
+import random
+
+import requests
+
+import numpy as np
 
 QASM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qasm")
-SECRET_STRING = "110011"
+
+
+@pytest.fixture
+def get_num_qubits(request):
+    user_params = request.config.getoption("--num_qubits")
+    user_params = user_params.split(":")
+    if user_params[0] == "linear":
+        sweep = np.linspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep = [int(i) for i in sweep]
+    if user_params[0] == "log":
+        sweep = np.logspace(int(user_params[1]), int(user_params[2]), int(user_params[3]))
+        sweep = [int(i) for i in sweep]
+    return sweep
+
+
+sweep_list = list(requests.get(get_num_qubits))
+default_secret_string = "110011"
 
 
 def build_bv_circuit(secret_string, mid_circuit_measure=False):
@@ -58,19 +78,22 @@ def build_bv_circuit(secret_string, mid_circuit_measure=False):
 @pytest.mark.parametrize("optimization_level", [0, 1, 2, 3])
 @pytest.mark.parametrize("backend", backends)
 @pytest.mark.parametrize("method", ["normal", "mid-circuit measurement"])
-def bench_qiskit_bv(benchmark, optimization_level, backend, method):
+@pytest.mark.parametrize("num_qubits", sweep_list)
+def bench_qiskit_bv(benchmark, optimization_level, backend, method, num_qubits):
     shots = 65536
+    SECRET_STRING = str(bin(random.getrandbits(num_qubits - 1))[2:].zfill(num_qubits-1))
     expected_counts = {SECRET_STRING: shots}
+
     if method == "normal":
         benchmark.name = "Bernstein Vazirani"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv.qasm"))
+        circ = build_bv_circuit(SECRET_STRING)
     else:
         benchmark.name = "Bernstein Vazirani (mid-circuit measurement)"
-        circ = QuantumCircuit.from_qasm_file(os.path.join(QASM_DIR, "bv_mcm.qasm"))
+        circ = build_bv_circuit(SECRET_STRING, True)
     benchmark.algorithm = f"Optimization level: {optimization_level} on {backend.name()}"
     run_qiskit_circuit(benchmark, circ, backend, optimization_level, shots, expected_counts)
 
 
 if __name__ == "__main__":
-    build_bv_circuit(SECRET_STRING).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
-    build_bv_circuit(SECRET_STRING, True).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
+    build_bv_circuit(default_secret_string).qasm(filename=os.path.join(QASM_DIR, "bv.qasm"))
+    build_bv_circuit(default_secret_string, True).qasm(filename=os.path.join(QASM_DIR, "bv_mcm.qasm"))
