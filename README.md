@@ -22,7 +22,7 @@ Red Queen is a framework for benchmarking quantum compilation algorithms. Since
 it was not designed as a package, there is no notion of installation. Hence, you
 must clone this repository to use it:
 ```bash
-git clone git@github.com:Qiskit/red-queen.git
+git clone https://github.com/Qiskit/red-queen.git
 ```
 
 To run benchmarks, you must first go to the `red-queen` directory and install 
