@@ -19,39 +19,39 @@ import subprocess
 import configparser
 import click
 
-
-def benchmark_retrieval():
+# This function retrives the paths for each benchmark and returns
+# a hashmap with the benchmark's name and it's path
+def benchmark_complier_retrieval():
     benchmark_dict = {}
-    type_list = []
     list_of_benchmarks = []
-    dir_path = "red_queen/games/"
-    for entry in os.scandir(dir_path):
-        if entry.is_dir():
-            benchmark_dict[entry.name] = []
-            sub_dict = {}
-            for sub in os.scandir(f"{dir_path}{entry.name}"):
-                if not sub.name.startswith("_") and sub.name.endswith(".py") and sub.is_file():
-                    sub_dict[sub.name] = sub.path
-            benchmark_dict[entry.name] = sub_dict
-
-    type_list = list(benchmark_dict.keys())
-    for benchmark_pairs in benchmark_dict.values():
-        for keys in benchmark_pairs.keys():
-            list_of_benchmarks.append(keys)
-
-    return benchmark_dict, type_list, list_of_benchmarks
-
-
-def complier_retrieval():
     list_of_compliers = []
+    benchmark_category_set = set()
+    benchmark_path = "games/"
+    for benchmark_category in os.scandir(benchmark_path):
+        if benchmark_category.is_dir():
+            benchmark_category_set.add(benchmark_category.name)
+            name_path_pair = {}
+            for benchmark in os.scandir(f"{benchmark_path}{benchmark_category.name}"):
+                if (
+                    not benchmark.name.startswith("_")
+                    and benchmark.name.endswith(".py")
+                    and benchmark.is_file()
+                ):
+                    name_path_pair[benchmark.name] = benchmark.path
+            benchmark_dict.update(name_path_pair)
+
+    for benchmark_name, _ in benchmark_dict.items():
+        list_of_benchmarks.append(benchmark_name)
+
     config = configparser.ConfigParser()
-    config.read("pytest.ini")
+    config.read("../pytest.ini")
     for complier in config["pytest"]["markers"].split("\n"):
         if complier != "":
             list_of_compliers.append(complier)
-    return list_of_compliers
+    return benchmark_dict, list_of_benchmarks, list_of_compliers
 
 
+# The function retrives the latest benchmark ran's results
 def result_retrieval():
     results = {}
     dir_path = "results"
@@ -63,6 +63,7 @@ def result_retrieval():
     return results
 
 
+# This functions creates the pytest cli call and runs it
 def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
     command_list = ["pytest"]
     compiler_command = [m_tag, compiler, "--store"]
@@ -91,6 +92,7 @@ def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
         )
 
 
+# This function displays the results
 def show_result():
     results_dict = result_retrieval()
     result_num = max(results_dict.keys())
@@ -102,13 +104,13 @@ def show_result():
         check=True,
     )
     click.echo("To view the table again:")
-    click.echo(" ".join(command_list))
+    click.echo(" ".join(command_list)+"\n")
 
 
-benchmark_category, benchmark_types, benchmarks = benchmark_retrieval()
-complier_list = complier_retrieval()
+benchmark_hash, benchmarks_list, complier_list = benchmark_complier_retrieval()
 
 
+# The code below deals with each flag of the cli
 @click.command()
 @click.option(
     "-c",
@@ -119,25 +121,17 @@ complier_list = complier_retrieval()
     help="enter a compliler here",
 )
 @click.option(
-    "-t",
-    "--benchmarkType",
-    "benchmarkType",
-    multiple=True,
-    type=click.Choice(benchmark_types),
-    help="enter the type of benchmark(s) here",
-)
-@click.option(
     "-b",
     "--benchmark",
     "benchmark",
     multiple=True,
-    type=click.Choice(benchmarks),
+    type=click.Choice(benchmarks_list),
     help="enter the specfic benchmark(s) here",
 )
-def main(compiler=None, benchmarkType=None, benchmark=None):
+# The main function calls on the above helper functions to run the desired benchmarks
+def main(compiler=None, benchmark=None):
     benchmark_paths = []
     pytest_paths = ""
-    mydict = {}
     m_tag = ""
     if len(compiler) > 0:
         m_tag = "-m"
@@ -145,44 +139,20 @@ def main(compiler=None, benchmarkType=None, benchmark=None):
     else:
         compiler = ""
     # ### This for loop ensures that we are able to run various benchmark types
-    i = 0
     j = 0
     ### Has a benchmark type been specified?
-    if len(benchmarkType) > 0:
-        while i < len(benchmarkType):
-            ### Is the inputted benchmark type valid?
-            if set(benchmarkType).issubset(benchmark_category):
-                ### Has a benchmark been specified?
-                if len(benchmark) > 0:
-                    ### Are the inputted benchmark(s) valid?
-                    if set(benchmark).issubset(benchmarks):
-                        ### Is the inputted benchmark within the inputted benchmark type suite?
-                        if set(benchmark).issubset(set(benchmark_category[benchmarkType[i]])):
-                            for j, _ in enumerate(benchmark):
-                                benchmark_paths.append(
-                                    benchmark_category[benchmarkType[0]][benchmark[j]]
-                                )
-                            pytest_paths = benchmark_paths
-                            run_benchmarks(pytest_paths, m_tag, compiler)
-                            show_result()
-                            i += 1
-                else:
-                    mydict = benchmark_category[benchmarkType[0]]
-                    for v in mydict.values():
-                        benchmark_paths.append(v)
-                    pytest_paths = " ".join(tuple(benchmark_paths))
-                    run_benchmarks(pytest_paths, m_tag, compiler)
-                    show_result()
-                    i += 1
+    if len(benchmark) > 0:
+        ### Are the inputted benchmark(s) valid?
+        if set(benchmark).issubset(benchmarks_list):
+            for j, _ in enumerate(benchmark):
+                benchmark_paths.append(benchmark_hash[benchmark[j]])
+                pytest_paths = benchmark_paths
+                run_benchmarks(pytest_paths, m_tag, compiler)
+                show_result()
+                i += 1
     else:
-        question = input(f"Would you like to run all {len(benchmarks)} available benchmarks (y/n) ")
-        if question.lower() == "y":
-            for benchmark_list in benchmark_category.values():
-                for paths in benchmark_list.values():
-                    benchmark_paths.append(paths)
-            pytest_paths = " ".join(tuple(benchmark_paths))
-            run_benchmarks(pytest_paths, m_tag, compiler)
-            show_result()
+        print("Please input benchmark")
+        print("Example:\nred-queen -b grovers.py")
 
 
 if __name__ == "__main__":
