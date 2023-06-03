@@ -21,10 +21,11 @@ import click
 
 # This function retrives the paths for each benchmark and returns
 # a hashmap with the benchmark's name and it's path
+# It also retrives all available compliers for Red Queen
 def benchmark_complier_retrieval():
     benchmark_dict = {}
     list_of_benchmarks = []
-    list_of_compliers = []
+    list_of_compliers = set()
     benchmark_category_set = set()
     benchmark_path = "games/"
     for benchmark_category in os.scandir(benchmark_path):
@@ -43,11 +44,12 @@ def benchmark_complier_retrieval():
     for benchmark_name, _ in benchmark_dict.items():
         list_of_benchmarks.append(benchmark_name)
 
+    # Config helps us process the .ini file
     config = configparser.ConfigParser()
     config.read("../pytest.ini")
     for complier in config["pytest"]["markers"].split("\n"):
         if complier != "":
-            list_of_compliers.append(complier)
+            list_of_compliers.add(complier)
     return benchmark_dict, list_of_benchmarks, list_of_compliers
 
 
@@ -55,18 +57,19 @@ def benchmark_complier_retrieval():
 def result_retrieval():
     results = {}
     dir_path = "results"
-    for entry in os.scandir(dir_path):
-        if entry.is_file():
-            filename = entry.name
+    for result in os.scandir(dir_path):
+        if result.is_file():
+            filename = result.name
             result_count = int(filename.split("_")[0])
-            results[result_count] = {entry.name: entry.path}
+            results[result_count] = {result.name: result.path}
     return results
 
 
-# This functions creates the pytest cli call and runs it
+# This functions creates the pytest command and runs it
 def run_benchmarks(pytest_paths: str, m_tag: str, compiler: str):
     command_list = ["pytest"]
     compiler_command = [m_tag, compiler, "--store"]
+    # Are you using a Windows Machine?
     if platform.system() == "Windows":
         command_list.insert(0, "-m")
         command_list.insert(0, "python")
@@ -104,7 +107,7 @@ def show_result():
         check=True,
     )
     click.echo("To view the table again:")
-    click.echo(" ".join(command_list)+"\n")
+    click.echo(" ".join(command_list) + "\n")
 
 
 benchmark_hash, benchmarks_list, complier_list = benchmark_complier_retrieval()
@@ -133,14 +136,15 @@ def main(compiler=None, benchmark=None):
     benchmark_paths = []
     pytest_paths = ""
     m_tag = ""
+    # Is there a specfic compiler listed?
     if len(compiler) > 0:
         m_tag = "-m"
         compiler = compiler[0]
     else:
         compiler = ""
-    # ### This for loop ensures that we are able to run various benchmark types
     j = 0
-    ### Has a benchmark type been specified?
+    i = 0
+    ### Has the user input benchmarks?
     if len(benchmark) > 0:
         ### Are the inputted benchmark(s) valid?
         if set(benchmark).issubset(benchmarks_list):
