@@ -9,7 +9,6 @@
 > [Carroll, Lewis: Through the Looking-Glass, Chapter 2](
     https://www.gutenberg.org/files/12/12-h/12-h.htm)
 
-
 # About
 
 The Red Queen benchmark framework was created to facilitate the benchmarking
@@ -19,14 +18,10 @@ The framework is tightly integrated into `pytest`.  Therefore, to use it
 effectively, you should know the basics of `pytest` first. Take a look at the
 [introductory material](https://docs.pytest.org/en/latest/getting-started.html).
 
-
-
 # Usage
-
 
 Red Queen is a framework for benchmarking quantum compilation algorithms. Since
 is is still in early development, you must clone this repository to use it:
-
 
 ```bash
 git clone git@github.com:Qiskit/red-queen.git
@@ -45,6 +40,7 @@ To create a virtual environment
 ```bash
 python -m venv .virtualenv
 ```
+
 After you create the virtual enviornment you need to activate it
 
 To activate the virtual enviornment
@@ -61,38 +57,45 @@ source .virtualenv/bin/activate
 .virtualenv\Scripts\activate.bat
 ```
 
-Lastly you need to install all of the neccessary dependencies for Red Queen
+You need to install all of the neccessary dependencies for Red Queen
 
 ```bash
 pip install -e .
 ```
-With all that you are ready to start using Red Queen.
 
-<br>
+Lastly `cd` into `red_queen` so that you'll be able to use the `cli` (command line interface)  
 
-Red Queen has a `CLI` (command line interface) that you can use to execute benchmarks. 
+```bash
+cd red_queen
+```
 
+With all that you are ready to start using Red Queen CLI.
+
+Red Queen's `CLI` simplifies the execution of benchmarks by constructing the pytest scripts for you all you gotta do is specify the benchmarks that you'd like to run.  
+
+You can find all available benchmark just by running this command
+
+```bash
+red-queen --help
+```
 
 The general templete for the `CLI` is as follows:
 
-
-
 ```bash
-red-queen -c <complier> -t <benchmark_type> -b <benchmark_name>
+red-queen -c <complier> -b <benchmark_name>
 ```
 
+> Side bar: The complier flag is optional. If you don't specify a complier the `cli` will just run `qiskit`
 
 Now, suppose you want to run the mapping benchmarks using only `tweedledum`.
 You can do this via the `CLI` or with `pytest`
-
-
 
 [For MacOs and Linux]
 
 With `CLI`
 
 ```bash
-red-queen -c tweedledum -t mapping -b map_queko.py
+red-queen -c tweedledum -b map_queko.py
 ```
 
 With `pytest`
@@ -101,13 +104,12 @@ With `pytest`
 python -m pytest games/mapping/map_queko.py -m tweedledum --store
 ```
 
-
 [For Windows]
 
 With `CLI`
 
 ```bash
-red-queen -c tweedledum -t mapping -b map_queko.py
+red-queen -c tweedledum -b map_queko.py
 ```
 
 With `pytest`
@@ -124,8 +126,6 @@ stdin handling.
 python -m pytest -s games/mapping/map_queko.py -m tweedledum --store
 ```
 
-
-
 The benchmark suite will consider all functions named `bench_*` in
 `games/mapping/map_queko.py`. Because
 The `--store` option tells the framework to store the results in json file in
@@ -135,7 +135,6 @@ use:
 ```bash
 python -m report.console_tables --storage results/0001_bench.json
 ```
-
 
 ## Warning
 
@@ -154,8 +153,7 @@ on the knowledge of the internals of the following established `pytest` plugins:
 
 ## License
 
-
-This software is licensed under the Apache 2.0 licence (see 
+This software is licensed under the Apache 2.0 licence (see
 [LICENSE](https://github.com/Qiskit/red-queen/blob/main/LICENSE))
 
 ## Contributing
