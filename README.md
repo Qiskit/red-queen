@@ -1,82 +1,53 @@
-> "Well, in our country," said Alice, still panting a little, "you'd generally 
-> get to somewhere else—if you run very fast for a long time, as we've been 
-> doing."
->
-> "A slow sort of country!" said the Queen. "Now, here, you see, it takes all 
-> the running you can do, to keep in the same place. If you want to get 
-> somewhere else, you must run at least twice as fast as that!"
->
-> [Carroll, Lewis: Through the Looking-Glass, Chapter 2](
-    https://www.gutenberg.org/files/12/12-h/12-h.htm)
+# benchiQle
 
-## About
-The Red Queen benchmark framework was created to facilitate the benchmarking
-algorithms used in quantum compilation.
+benchiQle (pronounced "ben-cha-cuhl") is a benchmarking tool designed to streamline the evaluation of quantum compilers. Our mission is to provide an accessible, standardized platform that facilitates direct comparisons of compiler performance, enabling apples to apples comparison between different quantum compilers, as well as different versions of the same quantum compiler. 
 
-The framework is tightly integrated into `pytest`.  Therefore, to use it 
-effectively, you should know the basics of `pytest` first. Take a look at the 
-[introductory material](https://docs.pytest.org/en/latest/getting-started.html).
+We built benchiQle because head-to-head performance measurements of quantum compliers tend to be inconsistent due to the fact that there is no widely accepted comparison tool. We aim for benchiQle to become a friendly standard for fair comparisons of quantum compilers. This is why we have made benchiQle modular, ensuring that one can easily add new benchmarks, metrics, and compilers for comparison. 
+
+## Overview
+
+benchiQle aspires to be the most comprehensive benchmarking tool for quantum compilers. It currently evaluates compilers on depth, speed, and memory footprint metrics for a user-defined backend. Instructions on adding benchmarks and metrics are given below. 
 
 ## Usage
-Red Queen is a framework for benchmarking quantum compilation algorithms. Since
-it was not designed as a package, there is no notion of installation. Hence, you
-must clone this repository to use it:
-```bash
-git clone git@github.com:Qiskit/red-queen.git
-```
 
-To run benchmarks, you must first go to the `red-queen` directory and install 
-the required packages:
-```bash
-cd red-queen
-pip install -r requirements.txt
-```
+### Running benchmarks
 
-Now, suppose you want to run the mapping benchmarks using only `tweedledum`.
-You must do it using `pytest`
-```bash
-pytest red_queen/games/mapping/map_queko.py -m tweedledum --store
-```
+To run benchiQle, first place the .qasm benchmarks you would like to run in the benchmarking/benchmarks folder. Then simply run ./run.sh from the command line, and you will be prompted with a series of questions about the compilers you would like to benchmark. Currently, the supported compilers are qiskit and pytket. You can find information about adding compilers below. They accepted backends are the FakeV2 backends listed [here](https://docs.quantum.ibm.com/api/qiskit/providers_fake_provider).
 
-To run pytest on Windows, you will have to use `python -m` in order to run the 
-`pytest` command. You will also need to add `-s` to your pytest call to disable 
-stdin handling.
-```bash
-python -m pytest -s red_queen/games/mapping/map_queko.py -m tweedledum --store
-```
+### Interpreting results
 
-The benchmark suite will consider all functions named `bench_*` in 
-`red_queen/games/mapping/map_queko.py`. Because we set the `-m` option, only the the ones
-marked with `tweedledum` will be run. (We could easy do the same for `qiskit`).
-If you don't define a `-m` option, all `bench_*` functions will be run.
+The output of benchiQle is a JSON file with the following format:
 
-The `--store` option tells the framework to store the results in json file in
-the `results` directory. To see the results as a table, you can use the you can
-use:
-```bash
-python -m report.console_tables --storage results/0001_bench.json
-```
+[{“metadata”: {‘compiler’: ‘compiler name’, version: ‘version num’, ‘optimization_level’: optimization_level_num}, “backend”: “name of backend”,
+“name of benchmark”: { 
+"total_time (seconds)": [time], "build_time (seconds)": [time], "bind_time (seconds)": [time], "transpile_time (seconds)": [time], "depth (gates)": [depth], "memory_footprint (MiB)": [memory], 
+"aggregate stattistics: 
+	{"depth (gates)": 
+		{"mean": mean, "median": median, "range": [range_0, range_1], "variance": variance, "standard_deviation": std}, 	"total_time (seconds)": {…}, 
+	"build_time (seconds)": {…}, 
+	"bind_time (seconds)": {…}, 
+	"transpile_time (seconds)": {…}, 
+	"memory_footprint (MiB)": {…}
+}}},
 
-## Warning
-This code is still under development. There are many razer sharp edges.
+{“metadata”: {‘compiler…}, …}, 
+…]
 
-For information of how execution works and other details about the framwork
-design, see the [ARCHITECTURE.md](ARCHITECTURE.md)
+### Adding compilers
 
-## Acknowledgments
+To add a compiler to benchiQle, one must:
+1. Modify the run.sh file to include the new compiler.
+2. And a conditional in the preprocess_benchmarks() function in the runner.py file that handles converting the .qasm benchmark into a high-level circuit supported by your compiler.
+3. Modify each metric (currently memory footprint, time, and depth) in the run_benchmark() method of runner.py to include a conditional for handling your new compiler.
 
-Some design choices made during the development of this framework were based
-on the knowledge of the internals of the following established `pytest` plugins:
+### Adding benchmarks
 
-* [pytest-xdist](https://github.com/pytest-dev/pytest-xdist)
-* [pytest-benchmark](https://github.com/ionelmc/pytest-benchmark)
+To add a benchmark, create a qasm file with your benchmark and add it to the benchmarking/benchmarks folder. A repository of benchmarks (some taken from QASMBench, others from red-queen) is located in the qasm-repository folder.
 
-## License
+### Adding metrics
 
-This software is licensed under the Apache 2.0 licence (see 
-[LICENSE](https://github.com/Qiskit/red-queen/blob/main/LICENSE))
+You can also add metrics by adding to the run_benchmark() method in the runner.py file. 
 
-## Contributing
+## Future work
 
-If you're interested in contributing to Red Queen please see the
-[contributing guide](CONTRIBUTING.md).
+In the future, we plan to streamline the process for adding compilers and metrics, as well as support arbitrary coupling maps for a given number of qubits and allow for testing of non-IBM backends. 
