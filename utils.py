@@ -18,7 +18,7 @@ from qiskit.providers.fake_provider import *
 
 import statistics
 
-def initialize_tket_pass_manager(backend):
+def initialize_tket_pass_manager(backend, optimization_level):
     """
     Initialize a pass manager for tket.
     """
@@ -41,7 +41,13 @@ def initialize_tket_pass_manager(backend):
             averaged_edge_gate_errors[tuple(Node(x) for x in qarg)] = avg
     # BUild tket compilation sequence:
     passlist = [DecomposeBoxes()]
-    passlist.append(FullPeepholeOptimise())
+    rebase_pass = auto_rebase_pass({OpType.X, OpType.SX, OpType.Rz, OpType.CZ})
+    if optimization_level == 0:
+        passlist.append(rebase_pass)
+    elif optimization_level == 1:
+        passlist.append(SynthesiseTket())
+    elif optimization_level == 2:
+        passlist.append(FullPeepholeOptimise())
     mid_measure = True
     noise_aware_placement = NoiseAwarePlacement(
         arch,
@@ -58,14 +64,16 @@ def initialize_tket_pass_manager(backend):
         )
     )
     passlist.append(NaivePlacementPass(arch))
-    passlist.extend(
-        [
-            KAKDecomposition(allow_swaps=False),
-            CliffordSimp(False),
-            SynthesiseTket(),
-        ]
-    )
-    rebase_pass = auto_rebase_pass({OpType.X, OpType.SX, OpType.Rz, OpType.CZ})
+    if optimization_level == 1:
+        passlist.append(SynthesiseTket())
+    if optimization_level == 2:
+        passlist.extend(
+            [
+                KAKDecomposition(allow_swaps=False),
+                CliffordSimp(False),
+                SynthesiseTket(),
+            ]
+        )
     passlist.extend([rebase_pass, RemoveRedundancies()])
     passlist.append(
         SimplifyInitial(allow_classical=False, create_all_qubits=True)

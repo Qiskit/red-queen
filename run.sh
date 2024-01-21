@@ -2,7 +2,6 @@
 
 echo "Welcome to BenchiQle!"
 echo "Enter the first compiler you would like to benchmark (we currently support 'qiskit' and 'pytket'): "
-
 read compiler1
 if [ "$compiler1" != "qiskit" ] && [ "$compiler1" != "pytket" ]
 then
@@ -10,19 +9,18 @@ then
     exit 0
 fi
 echo "Enter the version of the compiler you would like to benchmark "
-echo "(the latest qiskit version is '0.45.0', and the latest pytket is '1.22.0'): "
 read version1
 echo "Enter the optimization level for which you would like to run the compiler: "
 if [ "$compiler1" = "pytket" ]
 then
-    echo "Currently only using default optiization for pytket."
-    opt1=2
+    echo "(pytket supports optimization levels 0, 1, and 2)"
+    read opt1
 elif [ "$compiler1" = "qiskit" ]
 then
     echo "(qiskit supports optimization levels 0, 1, 2, and 3)"
     read opt1
 fi
-echo "Enter the second compiler you would like to benchmark. Press enter if you only want to benchmark one compiler. "
+echo "Enter the second compiler you would like to benchmark. Press RETURN if you only want to benchmark one compiler. "
 echo "(we currently support only 'qiskit' and 'pytket'): "
 read compiler2
 if [ -z "$compiler2" ]
@@ -31,21 +29,25 @@ then
 else
     echo "Benchmarking will be done with $compiler2 as the second compiler."
     echo "Enter the version of the compiler you would like to benchmark: "
-    echo "(the latest qiskit version is '0.45.0', and the latest pytket is '1.22.0'): "
     read version2
     echo "Enter the optimization level for which you would like to run the compiler: "
     if [ "$compiler2" = "pytket" ]
     then
-        echo "Currently only using default optiization for pytket."
-        opt2=2
+        echo "(pytket supports optimization levels 0, 1, and 2)"
+        read opt2
     elif [ "$compiler2" = "qiskit" ]
     then
         echo "(qiskit supports optimization levels 0, 1, 2, and 3)"
         read opt2
     fi
 fi
-echo "Enter the backend you would like to benchmark (default is IBM FakeWashington): "
+echo "Enter the backend you would like to benchmark (default is FakeWashingtonV2): "
+echo "SEE: https://docs.quantum.ibm.com/api/qiskit/providers_fake_provider"
 read backend
+if [ -z "$backend" ]
+then
+    backend="FakeWashingtonV2"
+fi
 echo "Enter the number of times you would like to run each benchmark (default is 1): "
 read num_runs
 if [ -z "$num_runs" ]
@@ -81,7 +83,7 @@ venv_spinup () {
     fi
 
     cd ..
-    python3 runner.py $1 $2 $3 $4 $5 $6 > memory_${1}_$2.txt
+    python3 runner.py $1 $2 $3 $4 $5 $6 
     deactivate
 }
 

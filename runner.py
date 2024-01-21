@@ -21,7 +21,7 @@ from utils import *
 from qiskit import *
 from qiskit.providers.fake_provider import *
 from qiskit.circuit.library import *
-from memory_profiler import profile
+from memory_profiler import memory_usage
 import numpy as np
 
 logger = logging.getLogger('my_logger')
@@ -80,13 +80,16 @@ class Runner:
 
             start_time = time.perf_counter()
             if self.compiler_dict["compiler"] == "pytket":
-                circuit = circuit_from_qasm("./benchmarking/benchmarks/" + f"{benchmark}", maxwidth=200)
+                if self.compiler_dict["version"] == "1.22.0":
+                    circuit = circuit_from_qasm("./benchmarking/benchmarks/" + f"{benchmark}", maxwidth=200)
+                else:
+                    circuit = circuit_from_qasm("./benchmarking/benchmarks/" + f"{benchmark}")
             elif self.compiler_dict["compiler"] == "qiskit":
                 circuit = QuantumCircuit.from_qasm_str(qasm)
             build_time = time.perf_counter()
 
             self.full_benchmark_list.append({benchmark: circuit})
-            self.metric_data[benchmark] = {"total_time (seconds)": [], "build_time (seconds)": [start_time - build_time], "transpile_time (seconds)": [], "depth (gates)": [], "memory_footprint (MiB)": []}
+            self.metric_data[benchmark] = {"total_time (seconds)": [], "build_time (seconds)": [build_time - start_time], "transpile_time (seconds)": [], "depth (gates)": [], "memory_footprint (MiB)": []}
             
     def run_benchmarks(self):
         """
@@ -118,32 +121,24 @@ class Runner:
             with open(f'results/results_run{run_number}.json', 'w') as json_file:
                 json.dump([self.metric_data], json_file)
 
-    @profile
     def transpile_in_process(self, benchmark, optimization_level):
         backend = choose_backend(self.backend)
-
+        start_mem = memory_usage(max_usage=True)
         if self.compiler_dict["compiler"] == "pytket":
-            tket_pm = initialize_tket_pass_manager(backend)
+            tket_pm = initialize_tket_pass_manager(backend, optimization_level)
             tket_pm.apply(benchmark)
         else:
             transpile(benchmark, backend=backend, optimization_level=optimization_level)
+
+        end_mem = memory_usage(max_usage=True)
+        memory = end_mem - start_mem
+        return memory
     
     def profile_func(self, benchmark):
         # To get accurate memory usage, need to multiprocess transpilation
         with multiprocessing.Pool(1) as pool:
-            pool.apply(self.transpile_in_process, (benchmark, self.compiler_dict["optimization_level"]))
-    
-    def extract_memory_increments(self, filename, target_line):
-        with open(filename, 'r') as f:
-            lines = f.readlines()
-            # Flag to check if the line with memory details is next
-            for line in lines:
-                if target_line in line:
-                    parts = line.split()
-                    if len(parts) > 3:  # Check to ensure the line has enough columns
-                        increment_value = float(parts[3])  # The "Increment" value is in the 4th column
-        return increment_value
-
+            memory = pool.apply(self.transpile_in_process, (benchmark, self.compiler_dict["optimization_level"]))
+        return memory 
         
     def run_benchmark(self, benchmark, metrics):
         """
@@ -165,25 +160,17 @@ class Runner:
             logger.info("Calculating memory footprint...")
             # Multiprocesss transpilation to get accurate memory usage
             # Must deepcopy benchmark_circuit to avoid compiling the same circuit multiple times
-            self.profile_func(copy.deepcopy(benchmark_circuit))
-            filename = f'memory_{str(sys.argv[1])}_{str(sys.argv[2])}.txt'
-
-            if self.compiler_dict["compiler"] == "pytket":
-                target_line = "tket_pm.apply(benchmark)"
-            else:
-                target_line = "transpile(benchmark, backend=backend, optimization_level=optimization_level)"
-
-            memory_data = self.extract_memory_increments(filename, target_line)
-            self.metric_data[benchmark_name]["memory_footprint (MiB)"].append(memory_data)
+            memory = self.profile_func(copy.deepcopy(benchmark_circuit))
+            self.metric_data[benchmark_name]["memory_footprint (MiB)"].append(memory)
 
         backend = choose_backend(self.backend)
         
         if "total_time (seconds)" not in self.exclude_list:
             logger.info("Calculating speed...")
             # to get accurate time measurement, need to run transpilation without profiling
-            benchmark_copy = copy.deepcopy(benchmark_circuit)
+            benchmark_copy = copy.deepcopy(benchmark_circuit, optimization_level=self.compiler_dict["optimization_level"])
             if self.compiler_dict["compiler"] == "pytket":
-                tket_pm = initialize_tket_pass_manager(backend)
+                tket_pm = initialize_tket_pass_manager(backend, optimization_level=self.compiler_dict["optimization_level"])
                 start_time = time.perf_counter()
                 tket_pm.apply(benchmark_copy)
             else:
@@ -199,7 +186,7 @@ class Runner:
                 tket_pm = initialize_tket_pass_manager(backend)
                 tket_pm.apply(benchmark_copy)
                 transpiled_circuit = benchmark_copy
-                qasm_string = circuit_to_qasm_str(transpiled_circuit, maxwidth=200)
+                qasm_string = circuit_to_qasm_str(transpiled_circuit) #, maxwidth=200)
             else:
                 transpiled_circuit = transpile(benchmark_copy, backend=backend, optimization_level=self.compiler_dict["optimization_level"])
                 qasm_string = transpiled_circuit.qasm()
