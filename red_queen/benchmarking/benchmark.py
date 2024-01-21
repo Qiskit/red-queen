@@ -16,32 +16,32 @@
 
 # Copyright © 2020, Battelle Memorial Institute
 
-# 1.Battelle Memorial Institute (hereinafter Battelle) hereby grants permission 
+# 1.Battelle Memorial Institute (hereinafter Battelle) hereby grants permission
 # to any person or entity lawfully obtaining a copy of this software and associated
-# documentation files (hereinafter “the Software”) to redistribute and use the 
-# Software in source and binary forms, with or without modification.  Such person 
-# or entity may use, copy, modify, merge, publish, distribute, sublicense, and/or 
-# sell copies of the Software, and may permit others to do so, subject to the 
+# documentation files (hereinafter “the Software”) to redistribute and use the
+# Software in source and binary forms, with or without modification.  Such person
+# or entity may use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and may permit others to do so, subject to the
 # following conditions:
 
-# - Redistributions of source code must retain the above copyright notice, this list 
-# of conditions and the following disclaimers. 
+# - Redistributions of source code must retain the above copyright notice, this list
+# of conditions and the following disclaimers.
 
-# - Redistributions in binary form must reproduce the above copyright notice, this list 
-# of conditions and the following disclaimer in the documentation and/or other materials 
-# provided with the distribution. 
+# - Redistributions in binary form must reproduce the above copyright notice, this list
+# of conditions and the following disclaimer in the documentation and/or other materials
+# provided with the distribution.
 
-# - Other than as used herein, neither the name Battelle Memorial Institute or Battelle 
-# may be used in any form whatsoever without the express written consent of Battelle.  
+# - Other than as used herein, neither the name Battelle Memorial Institute or Battelle
+# may be used in any form whatsoever without the express written consent of Battelle.
 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
-# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
-# SHALL BATTELLE OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL BATTELLE OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 # SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # This code is from QASMBench's QMetric.py module and adapted to work with red-queen.
@@ -60,8 +60,8 @@ import numpy as np
 Benchmark class for QASM strings. Handles preprocessing.
 """
 
-class Benchmark:
 
+class Benchmark:
     def __init__(self, qasm):
         self.qasm = qasm
         # =======  Global tables and variables =========
@@ -69,7 +69,7 @@ class Benchmark:
         # Standard gates are gates defined in OpenQASM header.
         # Dictionary in {"gate name": number of standard gates inside}
         self.STANDARD_GATE_TABLE = {
-            "r": 1,   # 2-Parameter rotation around Z-axis and X-axis
+            "r": 1,  # 2-Parameter rotation around Z-axis and X-axis
             "sx": 1,  # SX Gate - Square root X gate
             "u3": 1,  # 3-parameter 2-pulse single qubit gate
             "u2": 1,  # 2-parameter 1-pulse single qubit gate
@@ -88,12 +88,13 @@ class Benchmark:
             "ry": 1,  # Rotation around Y-axis
             "rz": 1,  # Rotation around Z-axis
             "c1": 1,  # Arbitrary 1-qubit gate
-            "c2": 1}  # Arbitrary 2-qubit gate
+            "c2": 1,
+        }  # Arbitrary 2-qubit gate
 
         # Composition gates are gates defined in OpenQASM header.
         # Dictionary in {"gate name": number of standard gates inside}
         self.COMPOSITION_GATE_TABLE = {
-            "p":1, # Phase Gate
+            "p": 1,  # Phase Gate
             "cz": 3,  # Controlled-Phase
             "cy": 3,  # Controlled-Y
             "swap": 3,  # Swap
@@ -112,8 +113,7 @@ class Benchmark:
             "rc3x": 18,  # Relative-phase 3-controlled X gate
             "c3x": 27,  # 3-controlled X gate
             "c3sqrtx": 27,  # 3-controlled sqrt(X) gate
-            "c4x": 87  # 4-controlled X gate
-
+            "c4x": 87,  # 4-controlled X gate
         }
 
         # OpenQASM native gate table, other gates are user-defined.
@@ -123,22 +123,76 @@ class Benchmark:
         # For the statistics of the number of CNOT or CX gate in the circuit
 
         # Number of CX in Standard gates
-        self.STANDARD_CX_TABLE = {"r": 0,"u3": 0, "u2": 0, "u1": 0, "sx" : 0, "cx": 1, "id": 0, "x": 0, "y": 0, "z": 0, "h": 0,
-                             "s": 0, "sdg": 0, "t": 0, "tdg": 0, "rx": 0, "ry": 0, "rz": 0, "c1": 0, "c2": 1}
+        self.STANDARD_CX_TABLE = {
+            "r": 0,
+            "u3": 0,
+            "u2": 0,
+            "u1": 0,
+            "sx": 0,
+            "cx": 1,
+            "id": 0,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "h": 0,
+            "s": 0,
+            "sdg": 0,
+            "t": 0,
+            "tdg": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "c1": 0,
+            "c2": 1,
+        }
         # Number of CX in Composition gates
-        self.COMPOSITION_CX_TABLE = {"p":0,"cz": 1, "cy": 1, "swap": 3, "ch": 2, "ccx": 6, "cswap": 8, "crx": 2, "cry": 2,
-                                "crz": 2, "cu1": 2, "cu3": 2, "rxx": 2, "rzz": 2, "ryy":2, "rccx": 3, "rc3x": 6, "c3x": 6,
-                                "c3sqrtx": 6,
-                                "c4x": 18}
+        self.COMPOSITION_CX_TABLE = {
+            "p": 0,
+            "cz": 1,
+            "cy": 1,
+            "swap": 3,
+            "ch": 2,
+            "ccx": 6,
+            "cswap": 8,
+            "crx": 2,
+            "cry": 2,
+            "crz": 2,
+            "cu1": 2,
+            "cu3": 2,
+            "rxx": 2,
+            "rzz": 2,
+            "ryy": 2,
+            "rccx": 3,
+            "rc3x": 6,
+            "c3x": 6,
+            "c3sqrtx": 6,
+            "c4x": 18,
+        }
 
         self.CX_TABLE = {**self.STANDARD_CX_TABLE, **self.COMPOSITION_CX_TABLE}
 
         self.USER_DEFINED_GATES = {}
         # Keywords in QASM that are currently not used
-        self.other_keys = ["measure", "barrier", "OPENQASM", "include", "creg", "if", "reset"]
+        self.other_keys = [
+            "measure",
+            "barrier",
+            "OPENQASM",
+            "include",
+            "creg",
+            "if",
+            "reset",
+        ]
         self.measure_key = "measure"
-        self.trigger_key = 'if'
-        self.skip_keys = ["OPENQASM","include", "qreg", "creg","barrier", "reset","//"]
+        self.trigger_key = "if"
+        self.skip_keys = [
+            "OPENQASM",
+            "include",
+            "qreg",
+            "creg",
+            "barrier",
+            "reset",
+            "//",
+        ]
 
         self.circuit = qiskit.QuantumCircuit().from_qasm_str(qasm)
         self.circuit = RemoveBarriers()(self.circuit)
@@ -151,76 +205,76 @@ class Benchmark:
         self.decompose_circuit()
         self.final_preprocessing()
 
-    def get_op(self,line):
+    def get_op(self, line):
         """
         :param line: A line of QASM
         :return: The operation contained in the line of QASM
         """
         if line.find("(") != -1:
-            line = line[:line.find("(")].strip()
+            line = line[: line.find("(")].strip()
         op = line.split(" ")[0].strip()
         return op
-    
-    def get_qubit_id(self,line):
+
+    def get_qubit_id(self, line):
         """
         Search for qubits that are active in a line of QASM code
         :param line: Line of QASM code
         :return: Qubits being used in the line of QASM code
         """
-        line = line.strip(';')
-        op_qubits = line.split(" ")[1].strip().split(',')
+        line = line.strip(";")
+        op_qubits = line.split(" ")[1].strip().split(",")
         qubit_ids = []
         for op_qubit in op_qubits:
-            if '[' in op_qubit:
-                qubit_prefix = op_qubit.split('[')[0]
-                num = int(re.findall('^.*?\[[^\d]*(\d+)[^\d]*\].*$',op_qubit)[0])
-                qubit_ids.append(qubit_prefix+str(num))
+            if "[" in op_qubit:
+                qubit_prefix = op_qubit.split("[")[0]
+                num = int(re.findall("^.*?\[[^\d]*(\d+)[^\d]*\].*$", op_qubit)[0])
+                qubit_ids.append(qubit_prefix + str(num))
             else:
                 qubit_ids = [x for x in self.qubit_labelled.keys() if op_qubit in x]
         return qubit_ids
-    
+
     def collate_gates(self):
         """
         Preprocessing function for QASM String
         :return: None
         """
         gate_def = "gate"
-        temporary_qasm = np.array([x.strip() for x in self.qasm.split('\n')])
-        start_point,end_point = None,None
+        temporary_qasm = np.array([x.strip() for x in self.qasm.split("\n")])
+        start_point, end_point = None, None
         to_remove = []
-        for index,line in enumerate(temporary_qasm):
-            line_contents = line.split(' ')
+        for index, line in enumerate(temporary_qasm):
+            line_contents = line.split(" ")
             if line_contents[0].strip() == gate_def:
                 start_point = index
                 gate_name = line_contents[1]
-                qubit_count = len(line_contents[2].split(','))
-            if line_contents[0].strip() == '}':
+                qubit_count = len(line_contents[2].split(","))
+            if line_contents[0].strip() == "}":
                 end_point = index
             if start_point and end_point:
                 gate_count = 0
                 cx_count = 0
-                for i in range(end_point-start_point-1):
-                    print(temporary_qasm[start_point+i+1])
-                    if '{' in temporary_qasm[start_point+i+1]:
+                for i in range(end_point - start_point - 1):
+                    print(temporary_qasm[start_point + i + 1])
+                    if "{" in temporary_qasm[start_point + i + 1]:
                         continue
-                    operation = self.get_op(temporary_qasm[start_point+i+1])
+                    operation = self.get_op(temporary_qasm[start_point + i + 1])
                     cx_count += self.CX_TABLE[operation]
                     gate_count += self.GATE_TABLE[operation]
-                to_remove.append((start_point,end_point))
-                end_point,start_point=None,None
+                to_remove.append((start_point, end_point))
+                end_point, start_point = None, None
                 self.USER_DEFINED_GATES[gate_name] = None
-                self.CX_TABLE[gate_name]=cx_count
-                self.GATE_TABLE[gate_name]=gate_count
+                self.CX_TABLE[gate_name] = cx_count
+                self.GATE_TABLE[gate_name] = gate_count
         valid_indexes = np.ones(len(temporary_qasm))
-        for start,end in to_remove:
-            valid_indexes[start:end+1] = 0
-        temporary_qasm = temporary_qasm[valid_indexes.astype('bool')]
+        for start, end in to_remove:
+            valid_indexes[start : end + 1] = 0
+        temporary_qasm = temporary_qasm[valid_indexes.astype("bool")]
         self.qasm = temporary_qasm
 
     def decompose_circuit(self):
         gates = list(self.USER_DEFINED_GATES.keys())
         for _ in range(len(gates)):
-            self.circuit = self.circuit.decompose(gates_to_decompose = gates)
+            self.circuit = self.circuit.decompose(gates_to_decompose=gates)
 
     def final_preprocessing(self):
         """
@@ -229,8 +283,8 @@ class Benchmark:
         """
         qreg = "qreg"
         creg = "creg"
-        regex_str = '^.*?\[[^\d]*(\d+)[^\d]*\].*$'
-        regex_id_str = '(.*?)\s*\['
+        regex_str = "^.*?\[[^\d]*(\d+)[^\d]*\].*$"
+        regex_id_str = "(.*?)\s*\["
         # Break QASM into line by line commands
         qasm = self.qasm
         # Search for all qubit declaration lines
@@ -240,38 +294,44 @@ class Benchmark:
         qbit_labelled = {}
         # Load all qubits into the qubit count and give them unique IDs
         for qubit_index in qubit_count:
-            info_string = qubit_index.split(' ')[-1]
+            info_string = qubit_index.split(" ")[-1]
             qubit_id = re.findall(regex_id_str, info_string)[0]
-            qbit_counts= int(re.findall(regex_str, qubit_index)[0])
+            qbit_counts = int(re.findall(regex_str, qubit_index)[0])
             try:
-                previous_cap = max(qbit_labelled.values()) +1
+                previous_cap = max(qbit_labelled.values()) + 1
             except:
                 previous_cap = 0
             for i in range(qbit_counts):
-                qbit_labelled[str(qubit_id)+str(i)] = i + previous_cap
-            t_qubits +=int(qbit_counts)
+                qbit_labelled[str(qubit_id) + str(i)] = i + previous_cap
+            t_qubits += int(qbit_counts)
         # Search for all cbit declaration lines
         cbit_count = [x for x in qasm if creg in x]
         cbit_labelled = {}
         # Load all cbits into the cbit count and give them unique IDs
         for cbit_index in cbit_count:
-            info_string = cbit_index.split(' ')[-1]
-            cbit_id = re.findall(regex_id_str,info_string)[0]
-            cbit_counts= int(re.findall(regex_str, cbit_index)[0])
+            info_string = cbit_index.split(" ")[-1]
+            cbit_id = re.findall(regex_id_str, info_string)[0]
+            cbit_counts = int(re.findall(regex_str, cbit_index)[0])
             for i in range(cbit_counts):
-                if len(cbit_labelled)==0:
-                    cbit_labelled[str(cbit_id)+str(i)]=i
+                if len(cbit_labelled) == 0:
+                    cbit_labelled[str(cbit_id) + str(i)] = i
                 else:
-                    cbit_labelled[str(cbit_id)+str(i)]=i+max(cbit_labelled.values())
-            t_cbits +=int(cbit_counts)
+                    cbit_labelled[str(cbit_id) + str(i)] = i + max(
+                        cbit_labelled.values()
+                    )
+            t_cbits += int(cbit_counts)
         # Remove all If statements from the QASM code, as we count these as gates.
-        for i,line in enumerate(qasm):
-            if self.trigger_key in line[:3]: # Fix this later - IF causes problems
-                indx = line.find(' ')
-                line = line[indx+1:]
+        for i, line in enumerate(qasm):
+            if self.trigger_key in line[:3]:  # Fix this later - IF causes problems
+                indx = line.find(" ")
+                line = line[indx + 1 :]
                 qasm[i] = line
-        filtered_qasm = [x for x in qasm if not any(skip_key in x for skip_key in self.skip_keys)]
-        filtered_qasm = [x for x in filtered_qasm if x != '']  # Drop any trailing end of lists such as ''
+        filtered_qasm = [
+            x for x in qasm if not any(skip_key in x for skip_key in self.skip_keys)
+        ]
+        filtered_qasm = [
+            x for x in filtered_qasm if x != ""
+        ]  # Drop any trailing end of lists such as ''
         measurement_count = len([x for x in filtered_qasm if self.measure_key in x])
         filtered_qasm = [x for x in filtered_qasm if not self.measure_key in x]
         self.measurement_count = measurement_count

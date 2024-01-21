@@ -18,6 +18,7 @@ from qiskit.providers.fake_provider import *
 
 import statistics
 
+
 def initialize_tket_pass_manager(backend, optimization_level):
     """
     Initialize a pass manager for tket.
@@ -26,15 +27,26 @@ def initialize_tket_pass_manager(backend, optimization_level):
     arch = Architecture(backend.coupling_map.graph.edge_list())
     averaged_node_gate_errors = {}
     averaged_edge_gate_errors = {}
-    averaged_readout_errors = {Node(x[0]): backend.target["measure"][x].error for x in backend.target["measure"]}
+    averaged_readout_errors = {
+        Node(x[0]): backend.target["measure"][x].error
+        for x in backend.target["measure"]
+    }
     for qarg in backend.target.qargs:
-        ops = [x for x in backend.target.operation_names_for_qargs(qarg) if x not in {"if_else", "measure", "delay"}]
-        errors = [backend.target[op][qarg].error for op in ops if backend.target[op][qarg].error is not None]
+        ops = [
+            x
+            for x in backend.target.operation_names_for_qargs(qarg)
+            if x not in {"if_else", "measure", "delay"}
+        ]
+        errors = [
+            backend.target[op][qarg].error
+            for op in ops
+            if backend.target[op][qarg].error is not None
+        ]
         if errors:
             avg = statistics.mean(errors)
         else:
             avg = 0  # or some other default value
-        
+
         if len(qarg) == 1:
             averaged_node_gate_errors[Node(qarg[0])] = avg
         else:
@@ -75,11 +87,10 @@ def initialize_tket_pass_manager(backend, optimization_level):
             ]
         )
     passlist.extend([rebase_pass, RemoveRedundancies()])
-    passlist.append(
-        SimplifyInitial(allow_classical=False, create_all_qubits=True)
-    )
+    passlist.append(SimplifyInitial(allow_classical=False, create_all_qubits=True))
     tket_pm = SequencePass(passlist)
     return tket_pm
+
 
 def choose_backend(backend):
     if backend == "FakeWashingtonV2":
