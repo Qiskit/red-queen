@@ -107,7 +107,6 @@ def initialize_tket_pass_manager(backend, optimization_level):
         Node(x[0]): backend.target["measure"][x].error
         for x in backend.target["measure"]
     }
-    backend.coupling_map.draw().save("coupling_map.png")
     for qarg in backend.target.qargs:
         ops = [
             x

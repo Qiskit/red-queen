@@ -12,7 +12,7 @@ red-queen v2 aspires to be the most comprehensive benchmarking tool for quantum 
 
 ### Running benchmarks
 
-To run red-queen v2, first place the .qasm benchmarks you would like to run in the benchmarking/benchmarks folder. Then simply run ./run.sh from the command line, and you will be prompted with a series of questions about the compilers you would like to benchmark. Currently, the supported compilers are qiskit and pytket. You can find information about adding compilers below. They accepted backends are the FakeV2 backends listed [here](https://docs.quantum.ibm.com/api/qiskit/providers_fake_provider).
+To run red-queen v2, first place the .qasm benchmarks you would like to run in the benchmarking/benchmarks folder. Then simply run `./run.sh` from the command line, and you will be prompted with a series of questions about the compilers you would like to benchmark. Currently, the supported compilers are qiskit and pytket. You can find information about adding compilers below. They accepted backends are the FakeV2 backends listed [here](https://docs.quantum.ibm.com/api/qiskit/providers_fake_provider).
 
 ### Interpreting results
 
