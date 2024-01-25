@@ -60,9 +60,9 @@ class Runner:
         self.metric_data = {"metadata: ": self.compiler_dict, "backend": self.backend}
         self.metric_list = [
             "total_time (seconds)",
-            "build_time (seconds)",
+            "parsing/build_time (seconds)",
             "transpile_time (seconds)",
-            #"depth (gates)",
+            "depth (gates)",
             "memory_footprint (MiB)",
         ]
         self.second_compiler_readout = second_compiler_readout
@@ -110,9 +110,9 @@ class Runner:
             # TODO: should fill these keys in based on exclude_list
             self.metric_data[benchmark] = {
                 "total_time (seconds)": [],
-                "build_time (seconds)": [build_time - start_time],
+                "parsing/build_time (seconds)": [build_time - start_time],
                 "transpile_time (seconds)": [],
-                #"depth (gates)": [],
+                "depth (gates)": [],
                 "memory_footprint (MiB)": [],
             }
 
@@ -153,13 +153,13 @@ class Runner:
                 json.dump([self.metric_data], json_file)
 
     def transpile_in_process(self, benchmark, optimization_level):
-        backend = FakeFlamingo(11, 1) # choose_backend(self.backend)
+        backend = FakeFlamingo(11) # choose_backend(self.backend)
         start_mem = memory_usage(max_usage=True)
         if self.compiler_dict["compiler"] == "pytket":
             tket_pm = initialize_tket_pass_manager(backend, optimization_level)
             tket_pm.apply(benchmark)
         else:
-            transpile(benchmark, backend=FakeFlamingo(11, 1), optimization_level=optimization_level) #backend, optimization_level=optimization_level)
+            transpile(benchmark, backend=FakeFlamingo(11), optimization_level=optimization_level) #backend, optimization_level=optimization_level)
 
         end_mem = memory_usage(max_usage=True)
         memory = end_mem - start_mem
@@ -197,7 +197,7 @@ class Runner:
             memory = self.profile_func(copy.deepcopy(benchmark_circuit))
             self.metric_data[benchmark_name]["memory_footprint (MiB)"].append(memory)
 
-        backend = FakeFlamingo(11, 1) #choose_backend(self.backend)
+        backend = FakeFlamingo(11) #choose_backend(self.backend)
 
         if "total_time (seconds)" not in self.exclude_list:
             logger.info("Calculating speed...")
@@ -223,29 +223,29 @@ class Runner:
             self.metric_data[benchmark_name]["total_time (seconds)"].append(
                 end_time
                 - start_time
-                + +self.metric_data[benchmark_name]["build_time (seconds)"][-1]
+                + +self.metric_data[benchmark_name]["parsing/build_time (seconds)"][-1]
                 + self.metric_data[benchmark_name]["transpile_time (seconds)"][-1]
             )
 
-        # if "depth (gates)" not in self.exclude_list:
-        #     benchmark_copy = copy.deepcopy(benchmark_circuit)
-        #     if self.compiler_dict["compiler"] == "pytket":
-        #         tket_pm = initialize_tket_pass_manager(backend, self.compiler_dict["optimization_level"])
-        #         tket_pm.apply(benchmark_copy)
-        #         transpiled_circuit = benchmark_copy
-        #         qasm_string = circuit_to_qasm_str(transpiled_circuit)  # , maxwidth=200)
-        #     else:
-        #         transpiled_circuit = transpile(
-        #             benchmark_copy,
-        #             backend=backend,
-        #             optimization_level=self.compiler_dict["optimization_level"],
-        #         )
-        #         qasm_string = transpiled_circuit.qasm()
+        if "depth (gates)" not in self.exclude_list:
+            benchmark_copy = copy.deepcopy(benchmark_circuit)
+            if self.compiler_dict["compiler"] == "pytket":
+                tket_pm = initialize_tket_pass_manager(backend, self.compiler_dict["optimization_level"])
+                tket_pm.apply(benchmark_copy)
+                transpiled_circuit = benchmark_copy
+                qasm_string = circuit_to_qasm_str(transpiled_circuit)  # , maxwidth=200)
+            else:
+                transpiled_circuit = transpile(
+                    benchmark_copy,
+                    backend=backend,
+                    optimization_level=self.compiler_dict["optimization_level"],
+                )
+                qasm_string = transpiled_circuit.qasm()
 
-        #     logger.info("Calculating depth...")
-        #     processed_qasm = Benchmark(qasm_string)
-        #     depth = metrics.get_circuit_depth(processed_qasm)
-        #     self.metric_data[benchmark_name]["depth (gates)"].append(depth)
+            logger.info("Calculating depth...")
+            processed_qasm = Benchmark(qasm_string)
+            depth = metrics.get_circuit_depth(processed_qasm)
+            self.metric_data[benchmark_name]["depth (gates)"].append(depth)
 
     def postprocess_metrics(self, benchmark):
         """
