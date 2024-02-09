@@ -7,9 +7,7 @@
 # that they have been altered from the originals.
 
 # PyTket imports
-import csv
 import statistics
-import time
 
 import numpy as np
 import rustworkx as rx
@@ -18,16 +16,12 @@ from pytket.architecture import Architecture
 from pytket.circuit import OpType, Node
 from pytket.passes import *
 from pytket.placement import NoiseAwarePlacement
-from pytket.qasm import circuit_from_qasm
-from pytket.qasm import circuit_to_qasm_str
 
 from qiskit.providers import BackendV2, Options
 from qiskit.transpiler import Target, InstructionProperties
 from qiskit.circuit.library import XGate, SXGate, RZGate, CZGate, ECRGate
 from qiskit.circuit import Measure, Delay, Parameter, IfElseOp
 from qiskit.providers.fake_provider import *
-
-import statistics
 
 
 class FakeFlamingo(BackendV2):

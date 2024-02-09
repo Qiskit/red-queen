@@ -26,6 +26,9 @@ from qiskit.circuit.library import *
 from memory_profiler import memory_usage
 import numpy as np
 
+from pytket.qasm import circuit_from_qasm
+from pytket.qasm import circuit_to_qasm_str
+
 logger = logging.getLogger("my_logger")
 logger.setLevel(logging.INFO)
 
@@ -151,14 +154,25 @@ class Runner:
         # TODO: If there is no results folder, create one.
         # TODO: fix the pathing here
 
+        # benchmarking_path = os.path.join(
+        #     os.path.dirname(__file__), "benchmarking", "benchmarks"
+        # )
+        # with open(os.path.join(benchmarking_path, qasm_name), "r") as f:
+        #     qasm = f.read()
+
+        
+
         if self.second_compiler_readout == "true":
-            with open(f"results/results_run{run_number - 1}.json", "r") as json_file:
+            results_path = os.path.join(os.path.dirname(__file__), "results", f"results_run{run_number - 1}.json")
+
+            with open(results_path, "r") as json_file:
                 data = json.load(json_file)
             data.append(self.metric_data)
-            with open(f"results/results_run{run_number - 1}.json", "w") as json_file:
+            with open(results_path, "w") as json_file:
                 json.dump(data, json_file)
         else:
-            with open(f"results/results_run{run_number}.json", "w") as json_file:
+            results_path = os.path.join(os.path.dirname(__file__), "results", f"results_run{run_number}.json")
+            with open(results_path, "w") as json_file:
                 json.dump([self.metric_data], json_file)
 
     def transpile_in_process(self, benchmark, optimization_level):
