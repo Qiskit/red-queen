@@ -29,6 +29,7 @@ from qiskit.providers.fake_provider import *
 
 import statistics
 
+
 class FakeFlamingo(BackendV2):
     """Fake multi chip backend."""
 
@@ -42,7 +43,7 @@ class FakeFlamingo(BackendV2):
                 :math:`n = \\frac{5d^2 - 2d - 1}{2}` where :math:`n` is the
                 number of qubits and :math:`d` is the ``distance``
         """
-        super().__init__(name='Fake Multi-QPU with Coupler Backend')
+        super().__init__(name="Fake Multi-QPU with Coupler Backend")
         graph = rx.generators.directed_heavy_hex_graph(distance, bidirectional=False)
         num_qubits = len(graph)
         rng = np.random.default_rng(seed=12345678942)
