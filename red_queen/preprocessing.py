@@ -49,19 +49,19 @@
 #
 # https://github.com/pnnl/QASMBench/blob/master/metrics/QMetric.py
 
-import numpy as np
-import qiskit
-from qiskit.compiler import *
-from qiskit.transpiler.passes import RemoveBarriers
 import re
+
 import numpy as np
 
-"""
-Benchmark class for QASM strings. Handles preprocessing.
-"""
+import qiskit
+from qiskit.transpiler.passes import RemoveBarriers
 
 
-class Benchmark:
+class Preprocess:
+    """
+    Preprocess class for QASM strings. Handles preprocessing.
+    """
+
     def __init__(self, qasm):
         self.qasm = qasm
         # =======  Global tables and variables =========
@@ -197,6 +197,14 @@ class Benchmark:
         self.circuit = qiskit.QuantumCircuit().from_qasm_str(qasm)
         self.circuit = RemoveBarriers()(self.circuit)
 
+        self.measurement_count = None
+        # Filter the QASM code for all lines containing strings within the "SKIP Keys" variable
+        self.qubit_count = None
+        self.cbit_count = None
+        self.qubit_labelled = None
+        self.cbit_labelled = None
+        self.processed_qasm = None
+
         self.preprocess_qasm()
 
     def preprocess_qasm(self):
@@ -227,7 +235,7 @@ class Benchmark:
         for op_qubit in op_qubits:
             if "[" in op_qubit:
                 qubit_prefix = op_qubit.split("[")[0]
-                num = int(re.findall("^.*?\[[^\d]*(\d+)[^\d]*\].*$", op_qubit)[0])
+                num = int(re.findall(r"^.*?\[[^\d]*(\d+)[^\d]*\].*$", op_qubit)[0])
                 qubit_ids.append(qubit_prefix + str(num))
             else:
                 qubit_ids = [x for x in self.qubit_labelled.keys() if op_qubit in x]
@@ -236,7 +244,6 @@ class Benchmark:
     def collate_gates(self):
         """
         Preprocessing function for QASM String
-        :return: None
         """
         gate_def = "gate"
         temporary_qasm = np.array([x.strip() for x in self.qasm.split("\n")])
@@ -247,7 +254,6 @@ class Benchmark:
             if line_contents[0].strip() == gate_def:
                 start_point = index
                 gate_name = line_contents[1]
-                qubit_count = len(line_contents[2].split(","))
             if line_contents[0].strip() == "}":
                 end_point = index
             if start_point and end_point:
@@ -278,13 +284,13 @@ class Benchmark:
 
     def final_preprocessing(self):
         """
-        Extensive analysis of QASM string. Counts qubits, gets qubit ID's etc. This is the large preprocessing function
-        :return:
+        Extensive analysis of QASM string. Counts qubits, gets qubit ID's etc. 
+        This is the large preprocessing function
         """
         qreg = "qreg"
         creg = "creg"
-        regex_str = "^.*?\[[^\d]*(\d+)[^\d]*\].*$"
-        regex_id_str = "(.*?)\s*\["
+        regex_str = r"^.*?\[[^\d]*(\d+)[^\d]*\].*$"
+        regex_id_str = r"(.*?)\s*\["
         # Break QASM into line by line commands
         qasm = self.qasm
         # Search for all qubit declaration lines

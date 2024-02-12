@@ -6,6 +6,49 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+# QASMBench Benchmark Suite:
+# A low-level OpenQASM benchmark suite for NISQ evaluation and simulation.
+
+# 06/04/2020 by Ang Li from High-Performance-Computing Group,
+# ACMD, PCSD, Pacific Northwest National Laboratory (PNNL),
+# Richland, WA, 99354, USA.
+
+
+# Copyright © 2020, Battelle Memorial Institute
+
+# 1.Battelle Memorial Institute (hereinafter Battelle) hereby grants permission
+# to any person or entity lawfully obtaining a copy of this software and associated
+# documentation files (hereinafter “the Software”) to redistribute and use the
+# Software in source and binary forms, with or without modification.  Such person
+# or entity may use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and may permit others to do so, subject to the
+# following conditions:
+
+# - Redistributions of source code must retain the above copyright notice, this list
+# of conditions and the following disclaimers.
+
+# - Redistributions in binary form must reproduce the above copyright notice, this list
+# of conditions and the following disclaimer in the documentation and/or other materials
+# provided with the distribution.
+
+# - Other than as used herein, neither the name Battelle Memorial Institute or Battelle
+# may be used in any form whatsoever without the express written consent of Battelle.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL BATTELLE OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# The functions get_qubit depths, get_maximum_qubit_depths, and get_circuit_depths are from QASMBench's QMetric.py module and adapted to work with red-queen.
+# The original source can be found at:
+#
+# https://github.com/pnnl/QASMBench/blob/master/metrics/QMetric.py
+
 import sys
 import os
 import json
@@ -14,8 +57,7 @@ import multiprocessing
 import logging
 import copy
 
-from benchmarking.benchmark import Benchmark
-from metrics.metrics import Metrics
+from preprocessing import Preprocess
 from utils import *
 
 import qiskit
@@ -26,8 +68,8 @@ from qiskit.circuit.library import *
 from memory_profiler import memory_usage
 import numpy as np
 
-from pytket.qasm import circuit_from_qasm
 from pytket.qasm import circuit_to_qasm_str
+from pytket.qasm import circuit_from_qasm
 
 logger = logging.getLogger("my_logger")
 logger.setLevel(logging.INFO)
@@ -38,7 +80,6 @@ console_handler.setLevel(logging.INFO)
 logger.addHandler(console_handler)
 
 # TODO: comment this class well
-
 
 class Runner:
     def __init__(
@@ -129,7 +170,6 @@ class Runner:
         """
         Run all benchmarks in full_benchmark_list.
         """
-        metrics = Metrics()
         logger_counter = 1
         for benchmark in self.full_benchmark_list:
 
@@ -141,24 +181,21 @@ class Runner:
                     + str(self.num_runs * len(self.full_benchmark_list))
                     + "..."
                 )
-                self.run_benchmark(benchmark, metrics)
+                self.run_benchmark(benchmark)
                 logger_counter += 1
 
-            # self.postprocess_metrics(benchmark)
+            self.calculate_aggregate_statistics(benchmark)
         self.save_results()
 
     def save_results(self):
+        results_dir = os.path.join(os.path.dirname(__file__), "results")
+    
+        # Check if the directory exists and create it if it doesn't
+        if not os.path.exists(results_dir):
+            os.makedirs(results_dir)
+
         self.delete_ds_store("results")
         run_number = len(self.list_files("results")) + 1
-
-        # TODO: If there is no results folder, create one.
-        # TODO: fix the pathing here
-
-        # benchmarking_path = os.path.join(
-        #     os.path.dirname(__file__), "benchmarking", "benchmarks"
-        # )
-        # with open(os.path.join(benchmarking_path, qasm_name), "r") as f:
-        #     qasm = f.read()
 
         if self.second_compiler_readout == "true":
             results_path = os.path.join(
@@ -203,7 +240,7 @@ class Runner:
             )
         return memory
 
-    def run_benchmark(self, benchmark, metrics):
+    def run_benchmark(self, benchmark):
         """
         Run a single benchmark.
 
@@ -270,13 +307,53 @@ class Runner:
                     qasm_string = transpiled_circuit.qasm()
                 else:
                     qasm_string = qasm2.dumps(transpiled_circuit)
-            processed_qasm = Benchmark(qasm_string)
-            depth = metrics.get_circuit_depth(processed_qasm)
+            processed_qasm = Preprocess(qasm_string)
+            depth = self.get_circuit_depth(processed_qasm)
             self.metric_data[benchmark_name]["depth (gates)"].append(depth)
 
-    def postprocess_metrics(self, benchmark):
+    def get_circuit_depth(self, benchmark):
+        self.get_qubit_depths(benchmark)
+        _, depth = self.get_maximum_qubit_depth(benchmark)
+        return depth
+
+    def get_qubit_depths(self, benchmark):
         """
-        Postprocess metrics to include aggregate statistics.
+        Get depth of a specific qubit
+        :return:
+        """
+        qubit_depth = {}
+        for gate in benchmark.processed_qasm:
+            op = benchmark.get_op(gate)
+            if op not in benchmark.GATE_TABLE:
+                print(
+                    f"{op} not counted towards evaluation. Not a valid from default gate tables"
+                )
+                continue
+            else:
+                qubit_id = benchmark.get_qubit_id(gate)
+                for qubit in qubit_id:
+                    if qubit not in qubit_depth.keys():
+                        qubit_depth[qubit] = 0
+                    qubit_depth[qubit] += 1
+        self.qubit_depth = qubit_depth
+
+    def get_maximum_qubit_depth(self, benchmark):
+        """
+        Get maximum qubit depth
+        :return:
+        """
+        self.get_qubit_depths(benchmark)
+        qubit_depths = self.qubit_depth
+        max_value = max(qubit_depths.values())  # maximum value
+        max_keys = [k for k, v in qubit_depths.items() if v == max_value][0]
+        # getting all keys containing the `maximum`
+        self.max_qubit_depth_id = max_keys
+        self.max_qubit_depth = max_value
+        return max_keys, max_value
+
+    def calculate_aggregate_statistics(self, benchmark):
+        """
+        Calculate aggregate statistics on metrics.
         """
         # For each metric, calculate mean, median, range, variance, standard dev
         benchmark_name = list(benchmark.keys())[0]
