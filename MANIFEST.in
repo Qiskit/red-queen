@@ -1,4 +1,3 @@
 include LICENSE.txt
 include requirements.txt
-include pytest.ini
-
+include red_queen/VERSION.txt
