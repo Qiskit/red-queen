@@ -72,7 +72,8 @@ class Preprocess:
 
         # Standard gates are gates defined in OpenQASM header.
         # Dictionary in {"gate name": number of standard gates inside}
-        self.STANDARD_GATE_TABLE = {  # pylint: disable=invalid-name
+        # pylint: disable=invalid-name
+        self.STANDARD_GATE_TABLE = {
             "r": 1,  # 2-Parameter rotation around Z-axis and X-axis
             "sx": 1,  # SX Gate - Square root X gate
             "u3": 1,  # 3-parameter 2-pulse single qubit gate
@@ -97,7 +98,7 @@ class Preprocess:
 
         # Composition gates are gates defined in OpenQASM header.
         # Dictionary in {"gate name": number of standard gates inside}
-        self.COMPOSITION_GATE_TABLE = {  # pylint: disable=invalid-name
+        self.COMPOSITION_GATE_TABLE = {
             "p": 1,  # Phase Gate
             "cz": 3,  # Controlled-Phase
             "cy": 3,  # Controlled-Y
@@ -124,13 +125,13 @@ class Preprocess:
         self.GATE_TABLE = {
             **self.COMPOSITION_GATE_TABLE,
             **self.STANDARD_GATE_TABLE,
-        }  # pylint: disable=invalid-name
+        }
 
         # ==================================================================================
         # For the statistics of the number of CNOT or CX gate in the circuit
 
         # Number of CX in Standard gates
-        self.STANDARD_CX_TABLE = {  # pylint: disable=invalid-name
+        self.STANDARD_CX_TABLE = {
             "r": 0,
             "u3": 0,
             "u2": 0,
@@ -153,7 +154,7 @@ class Preprocess:
             "c2": 1,
         }
         # Number of CX in Composition gates
-        self.COMPOSITION_CX_TABLE = {  # pylint: disable=invalid-name
+        self.COMPOSITION_CX_TABLE = {
             "p": 0,
             "cz": 1,
             "cy": 1,
@@ -179,9 +180,10 @@ class Preprocess:
         self.CX_TABLE = {
             **self.STANDARD_CX_TABLE,
             **self.COMPOSITION_CX_TABLE,
-        }  # pylint: disable=invalid-name
+        }
 
         self.USER_DEFINED_GATES = {}
+        # pylint: enable=invalid-name
         # Keywords in QASM that are currently not used
         self.other_keys = [
             "measure",
@@ -250,7 +252,7 @@ class Preprocess:
                 num = int(re.findall(r"^.*?\[[^\d]*(\d+)[^\d]*\].*$", op_qubit)[0])
                 qubit_ids.append(qubit_prefix + str(num))
             else:
-                qubit_ids = [x for x in self.qubit_labelled.keys() if op_qubit in x]
+                qubit_ids = [x for x in self.qubit_labelled if op_qubit in x]
         return qubit_ids
 
     def collate_gates(self):
@@ -317,7 +319,7 @@ class Preprocess:
             qbit_counts = int(re.findall(regex_str, qubit_index)[0])
             try:
                 previous_cap = max(qbit_labelled.values()) + 1
-            except Exception:
+            except ValueError:
                 previous_cap = 0
             for i in range(qbit_counts):
                 qbit_labelled[str(qubit_id) + str(i)] = i + previous_cap
