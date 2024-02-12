@@ -160,10 +160,12 @@ class Runner:
         # with open(os.path.join(benchmarking_path, qasm_name), "r") as f:
         #     qasm = f.read()
 
-        
-
         if self.second_compiler_readout == "true":
-            results_path = os.path.join(os.path.dirname(__file__), "results", f"results_run{run_number - 1}.json")
+            results_path = os.path.join(
+                os.path.dirname(__file__),
+                "results",
+                f"results_run{run_number - 1}.json",
+            )
 
             with open(results_path, "r") as json_file:
                 data = json.load(json_file)
@@ -171,7 +173,9 @@ class Runner:
             with open(results_path, "w") as json_file:
                 json.dump(data, json_file)
         else:
-            results_path = os.path.join(os.path.dirname(__file__), "results", f"results_run{run_number}.json")
+            results_path = os.path.join(
+                os.path.dirname(__file__), "results", f"results_run{run_number}.json"
+            )
             with open(results_path, "w") as json_file:
                 json.dump([self.metric_data], json_file)
 
