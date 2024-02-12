@@ -1,5 +1,5 @@
 """
-This module contains the Runner class, which is responsible for 
+This module contains the Runner class, which is responsible for
 running benchmarks on a given backend using a given compiler.
 """
 
@@ -222,7 +222,7 @@ class Runner:
             with open(results_path, "w", encoding="utf-8") as json_file:
                 json.dump([self.metric_data], json_file)
 
-    def transpile_in_process(self, benchmark, optimization_level):
+    def transpile_in_process(self, benchmark: QuantumCircuit, optimization_level: int):
         """
         Transpile a circuit in a separate process to get memory usage.
 
@@ -243,7 +243,7 @@ class Runner:
         memory = end_mem - start_mem
         return memory
 
-    def profile_func(self, benchmark):
+    def profile_func(self, benchmark: QuantumCircuit):
         """
         Profile a function to get memory usage.
 
@@ -257,11 +257,11 @@ class Runner:
             )
         return memory
 
-    def run_benchmark(self, benchmark):
+    def run_benchmark(self, benchmark: dict):
         """
         Run a single benchmark.
 
-        :param benchmark: name of benchmark to be used
+        :param benchmark: Name and circuit of benchmark to be run
         """
 
         benchmark_name = list(benchmark.keys())[0]
