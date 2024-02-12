@@ -1,3 +1,7 @@
+"""
+This module contains the Runner class, which is responsible for running benchmarks on a given backend using a given compiler.
+"""
+
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
@@ -44,7 +48,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# The functions get_qubit depths, get_maximum_qubit_depths, and get_circuit_depths are from QASMBench's QMetric.py module and adapted to work with red-queen.
+# The functions get_qubit depths, get_maximum_qubit_depths, and get_circuit_depths are from 
+# QASMBench's QMetric.py module and adapted to work with red-queen.
 # The original source can be found at:
 #
 # https://github.com/pnnl/QASMBench/blob/master/metrics/QMetric.py
@@ -58,13 +63,11 @@ import logging
 import copy
 
 from preprocessing import Preprocess
-from utils import *
+from utils import choose_backend, initialize_tket_pass_manager
 
 import qiskit
-from qiskit import *
+from qiskit import transpile, QuantumCircuit
 from qiskit import qasm2
-from qiskit.providers.fake_provider import *
-from qiskit.circuit.library import *
 from memory_profiler import memory_usage
 import numpy as np
 
@@ -89,21 +92,19 @@ class Runner:
         backend,
         num_runs: int,
         second_compiler_readout: str,
-        exclude_list=[],
     ):
         """
-        :param compiler_dict: dictionary of compiler info --> {"compiler": "COMPILER_NAME", "version": "VERSION NUM", "optimization_level": OPTIMIZATION_LEVEL}
+        :param compiler_dict: dictionary of compiler info --> {"compiler": "COMPILER_NAME", 
+            "version": "VERSION NUM", "optimization_level": OPTIMIZATION_LEVEL}
         :param backend: name of backend to be used --> "BACKEND_NAME"
         :param num_runs: number of times to run each benchmark
-        :param exclude_list: list of metrics to exclude from the benchmarking process
         """
 
         self.compiler_dict = compiler_dict
         self.backend = backend
         self.num_runs = num_runs
-        self.exclude_list = exclude_list
 
-        self.full_benchmark_list = []
+        self.full_benchmark_list = None
         self.metric_data = {"metadata: ": self.compiler_dict, "backend": self.backend}
         self.metric_list = [
             "total_time (seconds)",
@@ -120,15 +121,15 @@ class Runner:
         benchmarking_path = os.path.join(
             os.path.dirname(__file__), "benchmarking", "benchmarks"
         )
-        with open(os.path.join(benchmarking_path, qasm_name), "r") as f:
-            qasm = f.read()
+        with open(os.path.join(benchmarking_path, qasm_name), "r", encoding='utf-8') as file:
+            qasm = file.read()
         return qasm
 
     def list_files(self, directory):
         return [
-            f
-            for f in os.listdir(directory)
-            if os.path.isfile(os.path.join(directory, f))
+            file
+            for file in os.listdir(directory)
+            if os.path.isfile(os.path.join(directory, file))
         ]
 
     def delete_ds_store(self, directory):
@@ -144,11 +145,12 @@ class Runner:
             os.path.dirname(__file__), "benchmarking", "benchmarks"
         )
         benchmarks = self.list_files(benchmarking_path)
+        self.full_benchmark_list = []
         for benchmark in benchmarks:
             if benchmark == ".DS_Store":
                 continue
             qasm = self.get_qasm_benchmark(benchmark)
-            logger.info("Converting " + benchmark + " to high-level circuit...")
+            logger.info("Converting %s to high-level circuit...", benchmark)
 
             start_time = time.perf_counter()
             if self.compiler_dict["compiler"] == "pytket":
@@ -156,9 +158,7 @@ class Runner:
             elif self.compiler_dict["compiler"] == "qiskit":
                 circuit = QuantumCircuit.from_qasm_str(qasm)
             build_time = time.perf_counter()
-
             self.full_benchmark_list.append({benchmark: circuit})
-            # TODO: should fill these keys in based on exclude_list
             self.metric_data[benchmark] = {
                 "total_time (seconds)": [],
                 "parsing/build_time (seconds)": [build_time - start_time],
@@ -176,11 +176,9 @@ class Runner:
 
             for _ in range(self.num_runs):
                 logger.info(
-                    "Running benchmark "
-                    + str(logger_counter)
-                    + " of "
-                    + str(self.num_runs * len(self.full_benchmark_list))
-                    + "..."
+                    "Running benchmark %s of %s...",
+                    logger_counter,
+                    self.num_runs * len(self.full_benchmark_list)
                 )
                 self.run_benchmark(benchmark)
                 logger_counter += 1
@@ -205,16 +203,16 @@ class Runner:
                 f"results_run{run_number - 1}.json",
             )
 
-            with open(results_path, "r") as json_file:
+            with open(results_path, "r", encoding='utf-8') as json_file:
                 data = json.load(json_file)
             data.append(self.metric_data)
-            with open(results_path, "w") as json_file:
+            with open(results_path, "w", encoding='utf-8') as json_file:
                 json.dump(data, json_file)
         else:
             results_path = os.path.join(
                 os.path.dirname(__file__), "results", f"results_run{run_number}.json"
             )
-            with open(results_path, "w") as json_file:
+            with open(results_path, "w", encoding='utf-8') as json_file:
                 json.dump([self.metric_data], json_file)
 
     def transpile_in_process(self, benchmark, optimization_level):
@@ -245,72 +243,75 @@ class Runner:
         """
         Run a single benchmark.
 
-        :param benchmark_name: name of benchmark to be used
-        :param metric_data: dictionary containing all metric data
+        :param benchmark: name of benchmark to be used
         """
 
         benchmark_name = list(benchmark.keys())[0]
         benchmark_circuit = list(benchmark.values())[0]
 
-        # TODO: turn everything that is inside the if statement into a function that is in a separate file for
-        # each metric? Could have a metrics folder with a file for each metric. Users could easily add their own
-        # metrics by adding a file to the metrics folder. Then here we can for loop over all of the metrics in the folder.
-
-        if "memory_footprint (MiB)" not in self.exclude_list:
-            # Add memory_footprint to dictionary corresponding to this benchmark
-            logger.info("Calculating memory footprint...")
-            # Multiprocesss transpilation to get accurate memory usage
-            # Must deepcopy benchmark_circuit to avoid compiling the same circuit multiple times
-            memory = self.profile_func(copy.deepcopy(benchmark_circuit))
-            self.metric_data[benchmark_name]["memory_footprint (MiB)"].append(memory)
+        #############################
+        # MEMORY FOOTPRINT
+        #############################
+        
+        # Add memory_footprint to dictionary corresponding to this benchmark
+        logger.info("Calculating memory footprint...")
+        # Multiprocesss transpilation to get accurate memory usage
+        # Must deepcopy benchmark_circuit to avoid compiling the same circuit multiple times
+        memory = self.profile_func(copy.deepcopy(benchmark_circuit))
+        self.metric_data[benchmark_name]["memory_footprint (MiB)"].append(memory)
 
         backend = choose_backend(self.backend)  # FakeFlamingo(11)
 
-        if (
-            "total_time (seconds)" not in self.exclude_list
-            and "depth (gates)" not in self.exclude_list
-        ):
-            logger.info("Calculating speed...")
-            # to get accurate time measurement, need to run transpilation without profiling
-            benchmark_copy = copy.deepcopy(benchmark_circuit)
-            if self.compiler_dict["compiler"] == "pytket":
-                tket_pm = initialize_tket_pass_manager(
-                    backend, optimization_level=self.compiler_dict["optimization_level"]
-                )
-                start_time = time.perf_counter()
-                tket_pm.apply(benchmark_copy)
+        #############################
+        # TRANSPILATION TIME
+        #############################
 
-            else:
-                start_time = time.perf_counter()
-                transpiled_circuit = transpile(
-                    benchmark_copy,
-                    backend=backend,
-                    optimization_level=self.compiler_dict["optimization_level"],
-                )
+        logger.info("Calculating speed...")
+        # to get accurate time measurement, need to run transpilation without profiling
+        benchmark_copy = copy.deepcopy(benchmark_circuit)
+        if self.compiler_dict["compiler"] == "pytket":
+            tket_pm = initialize_tket_pass_manager(
+                backend, optimization_level=self.compiler_dict["optimization_level"]
+            )
+            start_time = time.perf_counter()
+            tket_pm.apply(benchmark_copy)
 
-            end_time = time.perf_counter()
-            self.metric_data[benchmark_name]["transpile_time (seconds)"].append(
-                end_time - start_time
+        else:
+            start_time = time.perf_counter()
+            transpiled_circuit = transpile(
+                benchmark_copy,
+                backend=backend,
+                optimization_level=self.compiler_dict["optimization_level"],
             )
-            self.metric_data[benchmark_name]["total_time (seconds)"].append(
-                end_time
-                - start_time
-                + +self.metric_data[benchmark_name]["parsing/build_time (seconds)"][-1]
-                + self.metric_data[benchmark_name]["transpile_time (seconds)"][-1]
-            )
-            logger.info("Calculating depth...")
-            if self.compiler_dict["compiler"] == "pytket":
-                transpiled_circuit = benchmark_copy
-                qasm_string = circuit_to_qasm_str(transpiled_circuit)
+
+        end_time = time.perf_counter()
+        self.metric_data[benchmark_name]["transpile_time (seconds)"].append(
+            end_time - start_time
+        )
+        self.metric_data[benchmark_name]["total_time (seconds)"].append(
+            end_time
+            - start_time
+            + +self.metric_data[benchmark_name]["parsing/build_time (seconds)"][-1]
+            + self.metric_data[benchmark_name]["transpile_time (seconds)"][-1]
+        )
+        
+        #############################
+        # DEPTH
+        #############################
+
+        logger.info("Calculating depth...")
+        if self.compiler_dict["compiler"] == "pytket":
+            transpiled_circuit = benchmark_copy
+            qasm_string = circuit_to_qasm_str(transpiled_circuit)
+        else:
+            # If the qiskit version is less than 1.0 use the old qasm method
+            if int(qiskit.__version__[0]) < 1:
+                qasm_string = transpiled_circuit.qasm()
             else:
-                # If the qiskit version is less than 1.0 use the old qasm method
-                if int(qiskit.__version__[0]) < 1:
-                    qasm_string = transpiled_circuit.qasm()
-                else:
-                    qasm_string = qasm2.dumps(transpiled_circuit)
-            processed_qasm = Preprocess(qasm_string)
-            depth = self.get_circuit_depth(processed_qasm)
-            self.metric_data[benchmark_name]["depth (gates)"].append(depth)
+                qasm_string = qasm2.dumps(transpiled_circuit)
+        processed_qasm = Preprocess(qasm_string)
+        depth = self.get_circuit_depth(processed_qasm)
+        self.metric_data[benchmark_name]["depth (gates)"].append(depth)
 
     def get_circuit_depth(self, benchmark):
         self.get_qubit_depths(benchmark)
@@ -330,26 +331,22 @@ class Runner:
                     f"{op} not counted towards evaluation. Not a valid from default gate tables"
                 )
                 continue
-            else:
-                qubit_id = benchmark.get_qubit_id(gate)
-                for qubit in qubit_id:
-                    if qubit not in qubit_depth.keys():
-                        qubit_depth[qubit] = 0
-                    qubit_depth[qubit] += 1
-        self.qubit_depth = qubit_depth
+            qubit_id = benchmark.get_qubit_id(gate)
+            for qubit in qubit_id:
+                if qubit not in qubit_depth:
+                    qubit_depth[qubit] = 0
+                qubit_depth[qubit] += 1
+        return qubit_depth
 
     def get_maximum_qubit_depth(self, benchmark):
         """
         Get maximum qubit depth
         :return:
         """
-        self.get_qubit_depths(benchmark)
-        qubit_depths = self.qubit_depth
+        qubit_depths = self.get_qubit_depths(benchmark)
         max_value = max(qubit_depths.values())  # maximum value
         max_keys = [k for k, v in qubit_depths.items() if v == max_value][0]
         # getting all keys containing the `maximum`
-        self.max_qubit_depth_id = max_keys
-        self.max_qubit_depth = max_value
         return max_keys, max_value
 
     def calculate_aggregate_statistics(self, benchmark):
