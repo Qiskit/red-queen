@@ -1,3 +1,7 @@
+"""
+This module contains the Preprocess class which is used for preprocessing QASM strings.
+"""
+
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
@@ -68,7 +72,7 @@ class Preprocess:
 
         # Standard gates are gates defined in OpenQASM header.
         # Dictionary in {"gate name": number of standard gates inside}
-        self.STANDARD_GATE_TABLE = {
+        self.STANDARD_GATE_TABLE = {  # pylint: disable=invalid-name
             "r": 1,  # 2-Parameter rotation around Z-axis and X-axis
             "sx": 1,  # SX Gate - Square root X gate
             "u3": 1,  # 3-parameter 2-pulse single qubit gate
@@ -93,7 +97,7 @@ class Preprocess:
 
         # Composition gates are gates defined in OpenQASM header.
         # Dictionary in {"gate name": number of standard gates inside}
-        self.COMPOSITION_GATE_TABLE = {
+        self.COMPOSITION_GATE_TABLE = {  # pylint: disable=invalid-name
             "p": 1,  # Phase Gate
             "cz": 3,  # Controlled-Phase
             "cy": 3,  # Controlled-Y
@@ -117,13 +121,16 @@ class Preprocess:
         }
 
         # OpenQASM native gate table, other gates are user-defined.
-        self.GATE_TABLE = {**self.COMPOSITION_GATE_TABLE, **self.STANDARD_GATE_TABLE}
+        self.GATE_TABLE = {
+            **self.COMPOSITION_GATE_TABLE,
+            **self.STANDARD_GATE_TABLE,
+        }  # pylint: disable=invalid-name
 
         # ==================================================================================
         # For the statistics of the number of CNOT or CX gate in the circuit
 
         # Number of CX in Standard gates
-        self.STANDARD_CX_TABLE = {
+        self.STANDARD_CX_TABLE = {  # pylint: disable=invalid-name
             "r": 0,
             "u3": 0,
             "u2": 0,
@@ -146,7 +153,7 @@ class Preprocess:
             "c2": 1,
         }
         # Number of CX in Composition gates
-        self.COMPOSITION_CX_TABLE = {
+        self.COMPOSITION_CX_TABLE = {  # pylint: disable=invalid-name
             "p": 0,
             "cz": 1,
             "cy": 1,
@@ -169,7 +176,10 @@ class Preprocess:
             "c4x": 18,
         }
 
-        self.CX_TABLE = {**self.STANDARD_CX_TABLE, **self.COMPOSITION_CX_TABLE}
+        self.CX_TABLE = {
+            **self.STANDARD_CX_TABLE,
+            **self.COMPOSITION_CX_TABLE,
+        }  # pylint: disable=invalid-name
 
         self.USER_DEFINED_GATES = {}
         # Keywords in QASM that are currently not used
@@ -208,12 +218,14 @@ class Preprocess:
         self.preprocess_qasm()
 
     def preprocess_qasm(self):
-
+        """
+        Preprocess pipeline for QASM strings.
+        """
         self.collate_gates()
         self.decompose_circuit()
         self.final_preprocessing()
 
-    def get_op(self, line):
+    def get_op(self, line: str):
         """
         :param line: A line of QASM
         :return: The operation contained in the line of QASM
@@ -223,7 +235,7 @@ class Preprocess:
         op = line.split(" ")[0].strip()
         return op
 
-    def get_qubit_id(self, line):
+    def get_qubit_id(self, line: str):
         """
         Search for qubits that are active in a line of QASM code
         :param line: Line of QASM code
@@ -305,7 +317,7 @@ class Preprocess:
             qbit_counts = int(re.findall(regex_str, qubit_index)[0])
             try:
                 previous_cap = max(qbit_labelled.values()) + 1
-            except:
+            except Exception:
                 previous_cap = 0
             for i in range(qbit_counts):
                 qbit_labelled[str(qubit_id) + str(i)] = i + previous_cap
