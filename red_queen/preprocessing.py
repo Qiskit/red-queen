@@ -284,7 +284,7 @@ class Preprocess:
 
     def final_preprocessing(self):
         """
-        Extensive analysis of QASM string. Counts qubits, gets qubit ID's etc. 
+        Extensive analysis of QASM string. Counts qubits, gets qubit ID's etc.
         This is the large preprocessing function
         """
         qreg = "qreg"

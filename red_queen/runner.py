@@ -81,6 +81,7 @@ logger.addHandler(console_handler)
 
 # TODO: comment this class well
 
+
 class Runner:
     def __init__(
         self,
@@ -189,7 +190,7 @@ class Runner:
 
     def save_results(self):
         results_dir = os.path.join(os.path.dirname(__file__), "results")
-    
+
         # Check if the directory exists and create it if it doesn't
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
