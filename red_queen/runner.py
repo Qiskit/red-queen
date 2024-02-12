@@ -1,5 +1,6 @@
 """
-This module contains the Runner class, which is responsible for running benchmarks on a given backend using a given compiler.
+This module contains the Runner class, which is responsible for 
+running benchmarks on a given backend using a given compiler.
 """
 
 # This code is licensed under the Apache License, Version 2.0. You may
@@ -68,6 +69,8 @@ from utils import choose_backend, initialize_tket_pass_manager
 import qiskit
 from qiskit import transpile, QuantumCircuit
 from qiskit import qasm2
+
+# pylint: disable=import-error
 from memory_profiler import memory_usage
 import numpy as np
 
@@ -82,10 +85,12 @@ console_handler.setLevel(logging.INFO)
 
 logger.addHandler(console_handler)
 
-# TODO: comment this class well
-
 
 class Runner:
+    """
+    Class for running benchmarks on a given backend using a given compiler.
+    """
+
     def __init__(
         self,
         compiler_dict: dict,
@@ -218,6 +223,12 @@ class Runner:
                 json.dump([self.metric_data], json_file)
 
     def transpile_in_process(self, benchmark, optimization_level):
+        """
+        Transpile a circuit in a separate process to get memory usage.
+
+        :param benchmark: benchmark to be transpiled
+        :param optimization_level: level of optimization to be used
+        """
         backend = choose_backend(self.backend)  # FakeFlamingo(11) #
         start_mem = memory_usage(max_usage=True)
         if self.compiler_dict["compiler"] == "pytket":
@@ -233,6 +244,11 @@ class Runner:
         return memory
 
     def profile_func(self, benchmark):
+        """
+        Profile a function to get memory usage.
+
+        :param benchmark: benchmark to be run
+        """
         # To get accurate memory usage, need to multiprocess transpilation
         with multiprocessing.Pool(1) as pool:
             memory = pool.apply(
