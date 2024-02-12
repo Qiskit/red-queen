@@ -48,7 +48,7 @@ This module contains the Runner class, which is responsible for running benchmar
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# The functions get_qubit depths, get_maximum_qubit_depths, and get_circuit_depths are from 
+# The functions get_qubit depths, get_maximum_qubit_depths, and get_circuit_depths are from
 # QASMBench's QMetric.py module and adapted to work with red-queen.
 # The original source can be found at:
 #
@@ -94,7 +94,7 @@ class Runner:
         second_compiler_readout: str,
     ):
         """
-        :param compiler_dict: dictionary of compiler info --> {"compiler": "COMPILER_NAME", 
+        :param compiler_dict: dictionary of compiler info --> {"compiler": "COMPILER_NAME",
             "version": "VERSION NUM", "optimization_level": OPTIMIZATION_LEVEL}
         :param backend: name of backend to be used --> "BACKEND_NAME"
         :param num_runs: number of times to run each benchmark
@@ -121,7 +121,9 @@ class Runner:
         benchmarking_path = os.path.join(
             os.path.dirname(__file__), "benchmarking", "benchmarks"
         )
-        with open(os.path.join(benchmarking_path, qasm_name), "r", encoding='utf-8') as file:
+        with open(
+            os.path.join(benchmarking_path, qasm_name), "r", encoding="utf-8"
+        ) as file:
             qasm = file.read()
         return qasm
 
@@ -178,7 +180,7 @@ class Runner:
                 logger.info(
                     "Running benchmark %s of %s...",
                     logger_counter,
-                    self.num_runs * len(self.full_benchmark_list)
+                    self.num_runs * len(self.full_benchmark_list),
                 )
                 self.run_benchmark(benchmark)
                 logger_counter += 1
@@ -203,16 +205,16 @@ class Runner:
                 f"results_run{run_number - 1}.json",
             )
 
-            with open(results_path, "r", encoding='utf-8') as json_file:
+            with open(results_path, "r", encoding="utf-8") as json_file:
                 data = json.load(json_file)
             data.append(self.metric_data)
-            with open(results_path, "w", encoding='utf-8') as json_file:
+            with open(results_path, "w", encoding="utf-8") as json_file:
                 json.dump(data, json_file)
         else:
             results_path = os.path.join(
                 os.path.dirname(__file__), "results", f"results_run{run_number}.json"
             )
-            with open(results_path, "w", encoding='utf-8') as json_file:
+            with open(results_path, "w", encoding="utf-8") as json_file:
                 json.dump([self.metric_data], json_file)
 
     def transpile_in_process(self, benchmark, optimization_level):
@@ -252,7 +254,7 @@ class Runner:
         #############################
         # MEMORY FOOTPRINT
         #############################
-        
+
         # Add memory_footprint to dictionary corresponding to this benchmark
         logger.info("Calculating memory footprint...")
         # Multiprocesss transpilation to get accurate memory usage
@@ -294,7 +296,7 @@ class Runner:
             + +self.metric_data[benchmark_name]["parsing/build_time (seconds)"][-1]
             + self.metric_data[benchmark_name]["transpile_time (seconds)"][-1]
         )
-        
+
         #############################
         # DEPTH
         #############################
