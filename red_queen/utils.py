@@ -1,3 +1,7 @@
+"""
+This module contains utility functions and classes for the red_queen project.
+"""
+
 # This code is licensed under the Apache License, Version 2.0. You may
 # obtain a copy of this license in the LICENSE.txt file in the root directory
 # of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
@@ -14,14 +18,73 @@ import rustworkx as rx
 
 from pytket.architecture import Architecture
 from pytket.circuit import OpType, Node
-from pytket.passes import *
 from pytket.placement import NoiseAwarePlacement
+from pytket.passes import (
+    DecomposeBoxes,
+    auto_rebase_pass,
+    SynthesiseTket,
+    FullPeepholeOptimise,
+    CXMappingPass,
+    NaivePlacementPass,
+    KAKDecomposition,
+    CliffordSimp,
+    RemoveRedundancies,
+    SimplifyInitial,
+    SequencePass,
+)
 
 from qiskit.providers import BackendV2, Options
 from qiskit.transpiler import Target, InstructionProperties
-from qiskit.circuit.library import XGate, SXGate, RZGate, CZGate, ECRGate
+from qiskit.circuit.library import XGate, SXGate, RZGate, CZGate
 from qiskit.circuit import Measure, Delay, Parameter, IfElseOp
-from qiskit.providers.fake_provider import *
+from qiskit.providers.fake_provider import (
+    FakeAlmadenV2,
+    FakeArmonkV2,
+    FakeAthensV2,
+    FakeAuckland,
+    FakeBelemV2,
+    FakeBoeblingenV2,
+    FakeBogotaV2,
+    FakeBrooklynV2,
+    FakeBurlingtonV2,
+    FakeCairoV2,
+    FakeCambridgeV2,
+    FakeCasablancaV2,
+    FakeEssexV2,
+    FakeGeneva,
+    FakeGuadalupeV2,
+    FakeHanoiV2,
+    FakeJakartaV2,
+    FakeJohannesburgV2,
+    FakeKolkataV2,
+    FakeLagosV2,
+    FakeLimaV2,
+    FakeLondonV2,
+    FakeManhattanV2,
+    FakeManilaV2,
+    FakeMelbourneV2,
+    FakeMontrealV2,
+    FakeMumbaiV2,
+    FakeNairobiV2,
+    FakeOslo,
+    FakeOurenseV2,
+    FakeParisV2,
+    FakePerth,
+    FakePrague,
+    FakePoughkeepsieV2,
+    FakeQuitoV2,
+    FakeRochesterV2,
+    FakeRomeV2,
+    FakeSantiagoV2,
+    FakeSherbrooke,
+    FakeSingaporeV2,
+    FakeSydneyV2,
+    FakeTorontoV2,
+    FakeValenciaV2,
+    FakeVigoV2,
+    FakeWashingtonV2,
+    FakeYorktownV2,
+)
 
 
 class FakeFlamingo(BackendV2):
@@ -86,7 +149,7 @@ class FakeFlamingo(BackendV2):
     def _default_options(cls):
         return Options(shots=1024)
 
-    def run(self, circuit, **kwargs):
+    def run(self, run_input, **kwargs):
         raise NotImplementedError("Lasciate ogne speranza, voi ch'intrate")
 
 
@@ -164,97 +227,60 @@ def initialize_tket_pass_manager(backend, optimization_level):
 
 
 def choose_backend(backend):
-    if backend == "FakeWashingtonV2":
-        return FakeWashingtonV2()
-    elif backend == "FakeAlmadenV2":
-        return FakeAlmadenV2()
-    elif backend == "FakeArmonkV2":
-        return FakeArmonkV2()
-    elif backend == "FakeAthensV2":
-        return FakeAthensV2()
-    elif backend == "FakeAuckland":
-        return FakeAuckland()
-    elif backend == "FakeBelemV2":
-        return FakeBelemV2()
-    elif backend == "FakeBoeblingenV2":
-        return FakeBoeblingenV2()
-    elif backend == "FakeBogotaV2":
-        return FakeBogotaV2()
-    elif backend == "FakeBrooklynV2":
-        return FakeBrooklynV2()
-    elif backend == "FakeBurlingtonV2":
-        return FakeBurlingtonV2()
-    elif backend == "FakeCairoV2":
-        return FakeCairoV2()
-    elif backend == "FakeCambridgeV2":
-        return FakeCambridgeV2()
-    elif backend == "FakeCasablancaV2":
-        return FakeCasablancaV2()
-    elif backend == "FakeEssexV2":
-        return FakeEssexV2()
-    elif backend == "FakeGeneva":
-        return FakeGeneva()
-    elif backend == "FakeGuadalupeV2":
-        return FakeGuadalupeV2()
-    elif backend == "FakeHanoiV2":
-        return FakeHanoiV2()
-    elif backend == "FakeJakartaV2":
-        return FakeJakartaV2()
-    elif backend == "FakeJohannesburgV2":
-        return FakeJohannesburgV2()
-    elif backend == "FakeKolkataV2":
-        return FakeKolkataV2()
-    elif backend == "FakeLagosV2":
-        return FakeLagosV2()
-    elif backend == "FakeLimaV2":
-        return FakeLimaV2()
-    elif backend == "FakeLondonV2":
-        return FakeLondonV2()
-    elif backend == "FakeManhattanV2":
-        return FakeManhattanV2()
-    elif backend == "FakeManilaV2":
-        return FakeManilaV2()
-    elif backend == "FakeMelbourneV2":
-        return FakeMelbourneV2()
-    elif backend == "FakeMontrealV2":
-        return FakeMontrealV2()
-    elif backend == "FakeMumbaiV2":
-        return FakeMumbaiV2()
-    elif backend == "FakeNairobiV2":
-        return FakeNairobiV2()
-    elif backend == "FakeOslo":
-        return FakeOslo()
-    elif backend == "FakeOurenseV2":
-        return FakeOurenseV2()
-    elif backend == "FakeParisV2":
-        return FakeParisV2()
-    elif backend == "FakePerth":
-        return FakePerth()
-    elif backend == "FakePrague":
-        return FakePrague()
-    elif backend == "FakePoughkeepsieV2":
-        return FakePoughkeepsieV2()
-    elif backend == "FakeQuitoV2":
-        return FakeQuitoV2()
-    elif backend == "FakeRochesterV2":
-        return FakeRochesterV2()
-    elif backend == "FakeRomeV2":
-        return FakeRomeV2()
-    elif backend == "FakeSantiagoV2":
-        return FakeSantiagoV2()
-    elif backend == "FakeSherbrooke":
-        return FakeSherbrooke()
-    elif backend == "FakeSingaporeV2":
-        return FakeSingaporeV2()
-    elif backend == "FakeSydneyV2":
-        return FakeSydneyV2()
-    elif backend == "FakeTorontoV2":
-        return FakeTorontoV2()
-    elif backend == "FakeValenciaV2":
-        return FakeValenciaV2()
-    elif backend == "FakeVigoV2":
-        return FakeVigoV2()
-    elif backend == "FakeWashingtonV2":
-        return FakeWashingtonV2()
-    elif backend == "FakeYorktownV2":
-        return FakeYorktownV2()
+    """
+    Choose a backend to run the circuit on.
+    """
+
+    backends = {
+        "FakeAlmadenV2": FakeAlmadenV2(),
+        "FakeArmonkV2": FakeArmonkV2(),
+        "FakeAthensV2": FakeAthensV2(),
+        "FakeAuckland": FakeAuckland(),
+        "FakeBelemV2": FakeBelemV2(),
+        "FakeBoeblingenV2": FakeBoeblingenV2(),
+        "FakeBogotaV2": FakeBogotaV2(),
+        "FakeBrooklynV2": FakeBrooklynV2(),
+        "FakeBurlingtonV2": FakeBurlingtonV2(),
+        "FakeCairoV2": FakeCairoV2(),
+        "FakeCambridgeV2": FakeCambridgeV2(),
+        "FakeCasablancaV2": FakeCasablancaV2(),
+        "FakeEssexV2": FakeEssexV2(),
+        "FakeGeneva": FakeGeneva(),
+        "FakeGuadalupeV2": FakeGuadalupeV2(),
+        "FakeHanoiV2": FakeHanoiV2(),
+        "FakeJakartaV2": FakeJakartaV2(),
+        "FakeJohannesburgV2": FakeJohannesburgV2(),
+        "FakeKolkataV2": FakeKolkataV2(),
+        "FakeLagosV2": FakeLagosV2(),
+        "FakeLimaV2": FakeLimaV2(),
+        "FakeLondonV2": FakeLondonV2(),
+        "FakeManhattanV2": FakeManhattanV2(),
+        "FakeManilaV2": FakeManilaV2(),
+        "FakeMelbourneV2": FakeMelbourneV2(),
+        "FakeMontrealV2": FakeMontrealV2(),
+        "FakeMumbaiV2": FakeMumbaiV2(),
+        "FakeNairobiV2": FakeNairobiV2(),
+        "FakeOslo": FakeOslo(),
+        "FakeOurenseV2": FakeOurenseV2(),
+        "FakeParisV2": FakeParisV2(),
+        "FakePerth": FakePerth(),
+        "FakePrague": FakePrague(),
+        "FakePoughkeepsieV2": FakePoughkeepsieV2(),
+        "FakeQuitoV2": FakeQuitoV2(),
+        "FakeRochesterV2": FakeRochesterV2(),
+        "FakeRomeV2": FakeRomeV2(),
+        "FakeSantiagoV2": FakeSantiagoV2(),
+        "FakeSherbrooke": FakeSherbrooke(),
+        "FakeSingaporeV2": FakeSingaporeV2(),
+        "FakeSydneyV2": FakeSydneyV2(),
+        "FakeTorontoV2": FakeTorontoV2(),
+        "FakeValenciaV2": FakeValenciaV2(),
+        "FakeVigoV2": FakeVigoV2(),
+        "FakeWashingtonV2": FakeWashingtonV2(),
+        "FakeYorktownV2": FakeYorktownV2(),
+    }
+
+    if backend not in backends:
+        raise ValueError(f"Invalid backend: {backend}")
+
+    return backends[backend]
