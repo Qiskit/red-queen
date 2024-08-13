@@ -1,6 +1,6 @@
 
 > [!IMPORTANT]  
-> This benchmarking tool is superseded by (Qiskit/benchpress)[https://github.com/Qiskit/benchpress]. The repository is no longer maintained and may contain errors. Contributions to this repo are no longer accepted.
+> This benchmarking tool is superseded by [Qiskit/benchpress](https://github.com/Qiskit/benchpress). The repository is no longer maintained and may contain errors. Contributions to this repo are no longer accepted.
 
 # red-queen v2
 
