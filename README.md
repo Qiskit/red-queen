@@ -1,3 +1,7 @@
+
+> [!IMPORTANT]  
+> This benchmarking tool is superseded by (Qiskit/benchpress)[https://github.com/Qiskit/benchpress]. The repository is no longer maintained and may contain errors. Contributions to this repo are no longer accepted.
+
 # red-queen v2
 
 red-queen v2 is a benchmarking tool designed to streamline the evaluation of quantum compilers. Our mission is to provide an accessible, standardized platform that facilitates direct comparisons of compiler performance, enabling apples to apples comparison between different quantum compilers, as well as different versions of the same quantum compiler. 
